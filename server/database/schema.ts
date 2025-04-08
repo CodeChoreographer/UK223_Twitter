@@ -63,7 +63,7 @@ Notification.belongsTo(User, { foreignKey: 'userId' });
 
 (async () => {
   try {
-    await sequelize.sync({ force: false });
+    await sequelize.sync({ force: false }); //only dev
   } catch (error) {
     console.error('❌ Fehler beim Synchronisieren der Datenbanktabellen:', error);
   }
