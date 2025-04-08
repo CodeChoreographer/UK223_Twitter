@@ -1,11 +1,9 @@
 import mysql from 'mysql2/promise'
-import { USER_TABLE, TWEET_TABLE } from './schema'
+import { USER_TABLE, TWEET_TABLE, COMMENT_TABLE, LIKE_TABLE, NOTIFICATION_TABLE } from './schema'
 
 export class Database {
-  // Properties
   private _pool: mysql.Pool
 
-  // Constructor
   constructor() {
     this._pool = mysql.createPool({
       database: process.env.DB_NAME || 'minitwitter',
@@ -17,24 +15,24 @@ export class Database {
     this.initializeDBSchema()
   }
 
-  // Methods
-  private initializeDBSchema = async () => {
-    console.log('Initializing DB schema...')
-    await this.executeSQL(USER_TABLE)
-    await this.executeSQL(TWEET_TABLE)
+  private async initializeDBSchema() {
+    try {
+      const connection = await this._pool.getConnection()
+
+      await connection.query(USER_TABLE)
+      await connection.query(TWEET_TABLE)
+      await connection.query(COMMENT_TABLE)
+      await connection.query(LIKE_TABLE)
+      await connection.query(NOTIFICATION_TABLE)
+
+      connection.release()
+      console.log('✅ Datenbanktabellen erfolgreich erstellt und initialisiert.')
+    } catch (error) {
+      console.error('❌ Fehler beim Initialisieren der Datenbanktabellen:', error)
+    }
   }
 
-  public executeSQL = async (query: string) => {
-    try {
-      const conn = await this._pool.getConnection()
-      try {
-        const [results] = await conn.query(query)
-        return results
-      } finally {
-        conn.release() // Use `release` instead of `end` to keep the connection in the pool
-      }
-    } catch (err) {
-      console.error('Error executing query:', err)
-    }
+  public getPool(): mysql.Pool {
+    return this._pool
   }
 }
