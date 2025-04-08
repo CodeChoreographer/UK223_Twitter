@@ -3,6 +3,7 @@ import { API } from './api'
 import http from 'http'
 import { resolve, dirname } from 'path'
 import { Database } from './database'
+import cors from 'cors' // CORS hinzufügen
 
 class Backend {
   // Properties
@@ -27,6 +28,9 @@ class Backend {
   // Constructor
   constructor() {
     this._app = express()
+    this._app.use(cors())
+    this._app.use(express.json())
+
     this._database = new Database()
     this._api = new API(this._app)
     this._env = process.env.NODE_ENV || 'development'
@@ -51,7 +55,11 @@ class Backend {
   private startServer(): void {
     if (this._env === 'production') {
       http.createServer(this.app).listen(3000, () => {
-        console.log('Server is listening!')
+        console.log('Server is listening on port 3000!')
+      })
+    } else {
+      this._app.listen(3000, () => {
+        console.log('Server is listening on port 3000 (Development Mode)!')
       })
     }
   }
