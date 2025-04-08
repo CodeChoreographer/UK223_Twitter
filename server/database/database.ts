@@ -1,38 +1,31 @@
-import mysql from 'mysql2/promise'
-import { USER_TABLE, TWEET_TABLE, COMMENT_TABLE, LIKE_TABLE, NOTIFICATION_TABLE } from './schema'
+import { Sequelize } from 'sequelize';
+
+export const sequelize = new Sequelize(
+  process.env.DB_NAME || 'minitwitter',
+  process.env.DB_USER || 'minitwitter',
+  process.env.DB_PASSWORD || 'supersecret123',
+  {
+    host: process.env.DB_HOST || 'localhost',
+    dialect: 'mariadb',
+    logging: false,
+  }
+);
 
 export class Database {
-  private _pool: mysql.Pool
-
   constructor() {
-    this._pool = mysql.createPool({
-      database: process.env.DB_NAME || 'minitwitter',
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'minitwitter',
-      password: process.env.DB_PASSWORD || 'supersecret123',
-      connectionLimit: 5,
-    })
-    this.initializeDBSchema()
+    this.connect();
   }
 
-  private async initializeDBSchema() {
+  private async connect() {
     try {
-      const connection = await this._pool.getConnection()
+      await sequelize.authenticate();
+      console.log('✅ Verbindung zur Datenbank erfolgreich hergestellt.');
 
-      await connection.query(USER_TABLE)
-      await connection.query(TWEET_TABLE)
-      await connection.query(COMMENT_TABLE)
-      await connection.query(LIKE_TABLE)
-      await connection.query(NOTIFICATION_TABLE)
+      await sequelize.sync({ alter: true });
+      console.log('✅ Datenbanktabellen erfolgreich synchronisiert.');
 
-      connection.release()
-      console.log('✅ Datenbanktabellen erfolgreich erstellt und initialisiert.')
     } catch (error) {
-      console.error('❌ Fehler beim Initialisieren der Datenbanktabellen:', error)
+      console.error('❌ Fehler beim Verbinden mit der Datenbank:', error);
     }
-  }
-
-  public getPool(): mysql.Pool {
-    return this._pool
   }
 }

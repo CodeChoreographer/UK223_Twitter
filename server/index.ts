@@ -3,7 +3,7 @@ import { API } from './api'
 import http from 'http'
 import { resolve, dirname } from 'path'
 import { Database } from './database'
-import cors from 'cors' // CORS hinzufügen
+import cors from 'cors'
 
 class Backend {
   // Properties
@@ -35,20 +35,13 @@ class Backend {
     this._api = new API(this._app)
     this._env = process.env.NODE_ENV || 'development'
 
-    this.setupStaticFiles()
     this.setupRoutes()
     this.startServer()
-  }
-
-  // Methods
-  private setupStaticFiles(): void {
-    this._app.use(express.static('client'))
   }
 
   private setupRoutes(): void {
     this._app.get('/', (req: Request, res: Response) => {
       const __dirname = resolve(dirname(''))
-      res.sendFile(__dirname + '/client/index.html')
     })
   }
 
