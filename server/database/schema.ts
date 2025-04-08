@@ -1,53 +1,70 @@
-const USER_TABLE = `
-    CREATE TABLE IF NOT EXISTS users (
-                                         id INT NOT NULL AUTO_INCREMENT,
-                                         name VARCHAR(255) NOT NULL,
-                                         PRIMARY KEY (id)
-    );
-`
+import { DataTypes } from 'sequelize';
+import { sequelize } from './database';
 
-const TWEET_TABLE = `
-    CREATE TABLE IF NOT EXISTS tweets (
-                                          id INT NOT NULL AUTO_INCREMENT,
-                                          user_id INT NOT NULL,
-                                          content VARCHAR(255) NOT NULL,
-                                          PRIMARY KEY (id),
-                                          FOREIGN KEY (user_id) REFERENCES users(id)
-    );
-`
 
-const COMMENT_TABLE = `
-    CREATE TABLE IF NOT EXISTS comments (
-                                            id INT NOT NULL AUTO_INCREMENT,
-                                            user_id INT NOT NULL,
-                                            tweet_id INT NOT NULL,
-                                            content VARCHAR(255) NOT NULL,
-                                            PRIMARY KEY (id),
-                                            FOREIGN KEY (user_id) REFERENCES users(id),
-                                            FOREIGN KEY (tweet_id) REFERENCES tweets(id)
-    );
-`
+export const User = sequelize.define('User', {
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  username: { type: DataTypes.STRING, allowNull: false, unique: true },
+  password: { type: DataTypes.STRING, allowNull: false },
+  role: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'user',
+    validate: { isIn: [['user', 'moderator', 'admin']] }
+  }
+});
 
-const LIKE_TABLE = `
-    CREATE TABLE IF NOT EXISTS likes (
-                                         id INT NOT NULL AUTO_INCREMENT,
-                                         user_id INT NOT NULL,
-                                         tweet_id INT NOT NULL,
-                                         PRIMARY KEY (id),
-                                         FOREIGN KEY (user_id) REFERENCES users(id),
-                                         FOREIGN KEY (tweet_id) REFERENCES tweets(id)
-    );
-`
+export const Tweet = sequelize.define('Tweet', {
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  userId: { type: DataTypes.INTEGER, allowNull: false },
+  content: { type: DataTypes.TEXT, allowNull: false }
+});
 
-const NOTIFICATION_TABLE = `
-    CREATE TABLE IF NOT EXISTS notifications (
-                                                 id INT NOT NULL AUTO_INCREMENT,
-                                                 user_id INT NOT NULL,
-                                                 message VARCHAR(255) NOT NULL,
-                                                 read_status BOOLEAN NOT NULL DEFAULT 0,
-                                                 PRIMARY KEY (id),
-                                                 FOREIGN KEY (user_id) REFERENCES users(id)
-    );
-`
+export const Comment = sequelize.define('Comment', {
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  userId: { type: DataTypes.INTEGER, allowNull: false },
+  tweetId: { type: DataTypes.INTEGER, allowNull: false },
+  content: { type: DataTypes.TEXT, allowNull: false }
+});
 
-export { USER_TABLE, TWEET_TABLE, COMMENT_TABLE, LIKE_TABLE, NOTIFICATION_TABLE }
+export const Like = sequelize.define('Like', {
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  userId: { type: DataTypes.INTEGER, allowNull: false },
+  tweetId: { type: DataTypes.INTEGER, allowNull: true },
+  commentId: { type: DataTypes.INTEGER, allowNull: true }
+});
+
+export const Notification = sequelize.define('Notification', {
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  userId: { type: DataTypes.INTEGER, allowNull: false },
+  message: { type: DataTypes.STRING, allowNull: false },
+  readStatus: { type: DataTypes.BOOLEAN, defaultValue: false }
+});
+
+
+User.hasMany(Tweet, { foreignKey: 'userId' });
+User.hasMany(Comment, { foreignKey: 'userId' });
+User.hasMany(Like, { foreignKey: 'userId' });
+User.hasMany(Notification, { foreignKey: 'userId' });
+
+Tweet.belongsTo(User, { foreignKey: 'userId' });
+Tweet.hasMany(Comment, { foreignKey: 'tweetId' });
+Tweet.hasMany(Like, { foreignKey: 'tweetId' });
+
+Comment.belongsTo(User, { foreignKey: 'userId' });
+Comment.belongsTo(Tweet, { foreignKey: 'tweetId' });
+Comment.hasMany(Like, { foreignKey: 'commentId' });
+
+Like.belongsTo(User, { foreignKey: 'userId' });
+Like.belongsTo(Tweet, { foreignKey: 'tweetId' });
+Like.belongsTo(Comment, { foreignKey: 'commentId' });
+
+Notification.belongsTo(User, { foreignKey: 'userId' });
+
+(async () => {
+  try {
+    await sequelize.sync({ force: false });
+  } catch (error) {
+    console.error('❌ Fehler beim Synchronisieren der Datenbanktabellen:', error);
+  }
+})();

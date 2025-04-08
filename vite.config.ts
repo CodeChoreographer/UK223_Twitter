@@ -7,7 +7,7 @@ export default defineConfig({
     exclude: ['fsevents'],
   },
   server: {
-    port: 4200,
+    port: 3000,
     hmr: {
       protocol: 'ws',
       host: 'localhost',
