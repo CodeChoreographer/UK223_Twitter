@@ -6,58 +6,35 @@ import { LikeController } from '../controllers/likeController'
 import { NotificationController } from '../controllers/notificationController'
 
 export class API {
-  // Properties
-  app: Express
-  private userController: UserController
-  private tweetController: TweetController
-  private commentController: CommentController
-  private likeController: LikeController
-  private notificationController: NotificationController
+  private app: Express
 
-  // Constructor
+  private userController = new UserController()
+  private tweetController = new TweetController()
+  private commentController = new CommentController()
+  private likeController = new LikeController()
+  private notificationController = new NotificationController()
+
   constructor(app: Express) {
     this.app = app
-
-    // Controller Instances
-    this.userController = new UserController()
-    this.tweetController = new TweetController()
-    this.commentController = new CommentController()
-    this.likeController = new LikeController()
-    this.notificationController = new NotificationController()
-
-    // Routen einrichten
     this.setupRoutes()
   }
 
-  // methodes
   private setupRoutes(): void {
-    // testroute
-    this.app.get('/hello', this.sayHello)
+    this.app.post('/api/users/register', this.userController.register.bind(this.userController))
+    this.app.post('/api/users/login', this.userController.login.bind(this.userController))
+    this.app.put('/api/users/update', this.userController.updateProfile.bind(this.userController))
 
-    // User-Routes
-    this.app.post('/api/users/register', (req, res) => this.userController.register(req, res))
-    this.app.post('/api/users/login', (req, res) => this.userController.login(req, res))
-    this.app.put('/api/users/update', (req, res) => this.userController.updateProfile(req, res))
+    this.app.post('/api/tweets/create', this.tweetController.createTweet.bind(this.tweetController))
+    this.app.put('/api/tweets/edit', this.tweetController.editTweet.bind(this.tweetController))
+    this.app.delete('/api/tweets/delete/:id', this.tweetController.deleteTweet.bind(this.tweetController))
 
-    // Tweet-Routes
-    this.app.post('/api/tweets/create', (req, res) => this.tweetController.createTweet(req, res))
-    this.app.put('/api/tweets/edit', (req, res) => this.tweetController.editTweet(req, res))
-    this.app.delete('/api/tweets/delete/:id', (req, res) => this.tweetController.deleteTweet(req, res))
+    this.app.post('/api/comments/add', this.commentController.addComment.bind(this.commentController))
+    this.app.delete('/api/comments/delete/:id', this.commentController.deleteComment.bind(this.commentController))
 
-    // Comment-Routes
-    this.app.post('/api/comments/add', (req, res) => this.commentController.addComment(req, res))
-    this.app.delete('/api/comments/delete/:id', (req, res) => this.commentController.deleteComment(req, res))
+    this.app.post('/api/likes/like', this.likeController.likeTweet.bind(this.likeController))
+    this.app.delete('/api/likes/unlike/:id', this.likeController.unlikeTweet.bind(this.likeController))
 
-    // Like-Routes
-    this.app.post('/api/likes/like', (req, res) => this.likeController.likeTweet(req, res))
-    this.app.delete('/api/likes/unlike/:id', (req, res) => this.likeController.unlikeTweet(req, res))
-
-    // Notification-Routes
-    this.app.post('/api/notifications/send', (req, res) => this.notificationController.sendNotification(req, res))
-    this.app.put('/api/notifications/mark-as-read/:id', (req, res) => this.notificationController.markAsRead(req, res))
-  }
-
-  private sayHello(req: Request, res: Response) {
-    res.send('Hello There!')
+    this.app.post('/api/notifications/send', this.notificationController.sendNotification.bind(this.notificationController))
+    this.app.put('/api/notifications/mark-as-read/:id', this.notificationController.markAsRead.bind(this.notificationController))
   }
 }
