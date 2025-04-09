@@ -1,0 +1,30 @@
+<div class="error-page-container">
+  <h1>Fehler {{ errorCode }}</h1>
+  <p>{{ errorMessage }}</p>
+
+  @if (errorCode === '404') {
+    <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdDdneHV6ZmpqbTg0ZDE2cGY4YnIxcHg0c2JsNnl0MWZuNm9qMnV2bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lAHuuo2j6VCMg/giphy.gif" class="giphy-image" >
+    <button (click)="navigateTo('/login')" class="button">Zum Login</button>
+  }
+  @else if (errorCode === '403') {
+    @if (!showEasterEgg) {
+      <img src="https://media.giphy.com/media/S6sZaHdqsGYFO/giphy.gif" class="giphy-image" alt="403 Fehler">
+      <p></p>
+      <button (click)="navigateTo('/users/login')" class="button">Zum Login</button>
+      <button (click)="navigateTo('/products')" class="button">Zur Startseite</button>
+    }
+    @else if (!redirecting) {
+      <img src="https://media1.giphy.com/media/jPy4jJ8T3nyCI/giphy.gif" class="giphy-image" alt="Easter Egg">
+      <button (click)="triggerEasterEgg()" class="button">Where will you bring me?</button>
+    }
+    @else {
+      <img src="https://media3.giphy.com/media/4mBzKXTeRmEOA/giphy.gif" class="giphy-image" alt="Traveling...">
+      <div class="loading-container">
+        <p>Loading your journey...</p>
+        <div class="progress-bar">
+          <span class="ork-runner">👹</span>
+        </div>
+      </div>
+    }
+  }
+</div>
