@@ -14,14 +14,12 @@ export class TweetController {
     }
   }
 
-  async editTweet(req: Request, res: Response): Promise<void> {
-    const { id, content } = req.body;
-
+  async getAllTweets(req: Request, res: Response): Promise<void> {
     try {
-      await Tweet.update({ content }, { where: { id } });
-      res.status(200).json({ message: 'Tweet updated successfully' });
+      const tweets = await Tweet.findAll();
+      res.status(200).json(tweets);
     } catch (error) {
-      res.status(500).json({ message: 'Error updating tweet', error });
+      res.status(500).json({ message: 'Error fetching tweets', error });
     }
   }
 

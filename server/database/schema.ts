@@ -1,11 +1,17 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from './database';
-import { seedInitialRolesAndRights } from './seed';
+
 
 export const User = sequelize.define('User', {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   username: { type: DataTypes.STRING, allowNull: false, unique: true },
-  password: { type: DataTypes.STRING, allowNull: false }
+  password: { type: DataTypes.STRING, allowNull: false },
+  role: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'user',
+    validate: { isIn: [['user', 'moderator', 'admin']] }
+  }
 });
 
 export const Tweet = sequelize.define('Tweet', {
@@ -35,25 +41,6 @@ export const Notification = sequelize.define('Notification', {
   readStatus: { type: DataTypes.BOOLEAN, defaultValue: false }
 });
 
-export const Role = sequelize.define('Role', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  name: { type: DataTypes.STRING, allowNull: false, unique: true }
-});
-
-export const Right = sequelize.define('Right', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  name: { type: DataTypes.STRING, allowNull: false, unique: true }
-});
-
-export const UserRole = sequelize.define('UserRole', {
-  userId: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
-  roleId: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true }
-});
-
-export const RoleRight = sequelize.define('RoleRight', {
-  roleId: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
-  rightId: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true }
-});
 
 User.hasMany(Tweet, { foreignKey: 'userId' });
 User.hasMany(Comment, { foreignKey: 'userId' });
@@ -74,20 +61,10 @@ Like.belongsTo(Comment, { foreignKey: 'commentId' });
 
 Notification.belongsTo(User, { foreignKey: 'userId' });
 
-User.belongsToMany(Role, { through: UserRole, foreignKey: 'userId' });
-Role.belongsToMany(User, { through: UserRole, foreignKey: 'roleId' });
-UserRole.belongsTo(Role, { foreignKey: 'roleId' });
-Role.hasMany(UserRole, { foreignKey: 'roleId' });
-
-Role.belongsToMany(Right, { through: RoleRight, foreignKey: 'roleId' });
-Right.belongsToMany(Role, { through: RoleRight, foreignKey: 'rightId' });
-
 (async () => {
   try {
-    await sequelize.sync({ force: false })
-    await seedInitialRolesAndRights()
-    console.log('✅ Datenbanktabellen erfolgreich synchronisiert')
+    await sequelize.sync({ force: false }); //only dev
   } catch (error) {
-    console.error('❌ Fehler beim Synchronisieren der Datenbanktabellen:', error)
+    console.error('❌ Fehler beim Synchronisieren der Datenbanktabellen:', error);
   }
-})()
+})();

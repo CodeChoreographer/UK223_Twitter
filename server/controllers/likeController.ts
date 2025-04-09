@@ -15,10 +15,10 @@ export class LikeController {
   }
 
   async unlikeTweet(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
+    const { userId, tweetId } = req.body;
 
     try {
-      await Like.destroy({ where: { id } });
+      await Like.destroy({ where: { userId, tweetId } });
       res.status(200).json({ message: 'Tweet unliked successfully' });
     } catch (error) {
       res.status(500).json({ message: 'Error unliking tweet', error });
