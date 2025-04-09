@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TweetComponent } from './tweet.component';
+import { EditTweetDialogComponent } from './edit-tweet-dialog.component';
 
-describe('TweetComponent', () => {
-  let component: TweetComponent;
-  let fixture: ComponentFixture<TweetComponent>;
+describe('EditTweetDialogComponent', () => {
+  let component: EditTweetDialogComponent;
+  let fixture: ComponentFixture<EditTweetDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TweetComponent]
+      imports: [EditTweetDialogComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TweetComponent);
+    fixture = TestBed.createComponent(EditTweetDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

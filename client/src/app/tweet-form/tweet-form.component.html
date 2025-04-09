@@ -1,0 +1,21 @@
+<section class="bg-gray-800 p-4 rounded-lg shadow mb-6">
+  <h3 class="text-xl text-orange-400 font-semibold mb-4">Neuer Beitrag</h3>
+
+  <form (submit)="submitTweet(); $event.preventDefault()" class="space-y-4">
+    <textarea
+      [(ngModel)]="tweetText"
+      name="tweet"
+      required
+      placeholder="Was passiert gerade?"
+      class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
+      rows="3"
+    ></textarea>
+
+    <button
+      type="submit"
+      class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded"
+    >
+      Posten
+    </button>
+  </form>
+</section>

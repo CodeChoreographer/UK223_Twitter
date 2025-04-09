@@ -1,46 +1,76 @@
-import { Request, Response } from 'express';
-import { Tweet } from '../database';
+import { Response } from 'express';
+import { AuthenticatedRequest } from '../api/authenticateToken';
+import { Tweet, User, Like } from '../database';
 
 export class TweetController {
-  async createTweet(req: Request, res: Response): Promise<void> {
-    const { userId, content } = req.body;
+  async createTweet(req: AuthenticatedRequest, res: Response): Promise<Response> {
+    const { content } = req.body;
+    const userId = req.user?.userId;
+
+    if (!userId || !content) {
+      return res.status(400).json({ message: 'Invalide Anfrage: userId oder Inhalt fehlt' });
+    }
 
     try {
       const tweet = await Tweet.create({ userId, content });
-      res.status(201).json({ message: 'Tweet created successfully', tweet });
+      return res.status(201).json({ message: 'Beitrag erfolgreich gepostet', tweet });
     } catch (error) {
-      res.status(500).json({ message: 'Error creating tweet', error });
+      return res.status(500).json({ message: 'Fehler beim Erstellen des Beitrags', error });
     }
   }
 
-  async getAllTweets(req: Request, res: Response): Promise<void> {
+  async getAllTweets(req: AuthenticatedRequest, res: Response): Promise<Response> {
+    const currentUserId = req.user?.id;
+
     try {
-      const tweets = await Tweet.findAll(); // Sequelize-Methode
-      res.status(200).json(tweets);
+      const tweets = await Tweet.findAll({
+        include: [
+          { model: User, attributes: ['id', 'username'] },
+          { model: Like, attributes: ['userId'] }
+        ],
+        order: [['createdAt', 'DESC']]
+      });
+
+      const result = tweets.map((tweet: any) => {
+        const likes = tweet.Likes || [];
+        const likedByMe = likes.some((like: any) => like.userId === currentUserId);
+
+        return {
+          id: tweet.id,
+          content: tweet.content,
+          createdAt: tweet.createdAt,
+          userId: tweet.userId,
+          user: tweet.User,
+          likes: likes.length,
+          likedByMe
+        };
+      });
+
+      return res.status(200).json(result);
     } catch (error) {
-      res.status(500).json({ message: 'Fehler beim Laden der Tweets', error });
+      return res.status(500).json({ message: 'Fehler beim Laden der Beiträge', error });
     }
   }
 
-  async editTweet(req: Request, res: Response): Promise<void> {
+  async editTweet(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const { id, content } = req.body;
 
     try {
       await Tweet.update({ content }, { where: { id } });
-      res.status(200).json({ message: 'Tweet updated successfully' });
+      return res.status(200).json({ message: 'Beitrag erfolgreich bearbeitet' });
     } catch (error) {
-      res.status(500).json({ message: 'Error updating tweet', error });
+      return res.status(500).json({ message: 'Fehler beim Bearbeiten des Beitrags', error });
     }
   }
 
-  async deleteTweet(req: Request, res: Response): Promise<void> {
+  async deleteTweet(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const { id } = req.params;
 
     try {
       await Tweet.destroy({ where: { id } });
-      res.status(200).json({ message: 'Tweet deleted successfully' });
+      return res.status(200).json({ message: 'Beitrag erfolgreich gelöscht' });
     } catch (error) {
-      res.status(500).json({ message: 'Error deleting tweet', error });
+      return res.status(500).json({ message: 'Fehler beim Löschen des Beitrags', error });
     }
   }
 }

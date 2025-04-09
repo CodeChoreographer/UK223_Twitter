@@ -1,0 +1,15 @@
+<section class="space-y-4">
+  @for (tweet of tweets; track tweet.id) {
+    <app-tweet-item
+      [tweet]="tweet"
+      [currentUserId]="currentUserId"
+      (likeClicked)="handleLike($event)"
+      (editClicked)="handleEdit($event)"
+      (deleteClicked)="handleDelete($event)"
+    ></app-tweet-item>
+  }
+
+  @if (tweets.length === 0) {
+    <p class="text-center text-gray-500 mt-6">Noch keine Beiträge vorhanden.</p>
+  }
+</section>

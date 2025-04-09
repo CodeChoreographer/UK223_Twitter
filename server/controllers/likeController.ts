@@ -2,26 +2,35 @@ import { Request, Response } from 'express';
 import { Like } from '../database';
 
 export class LikeController {
-
-  async likeTweet(req: Request, res: Response): Promise<void> {
+  async likeTweet(req: Request, res: Response): Promise<Response> {
     const { userId, tweetId } = req.body;
 
     try {
+      const existing = await Like.findOne({ where: { userId, tweetId } });
+
+      if (existing) {
+        return res.status(200).json({ message: 'Tweet bereits geliked', like: existing });
+      }
+
       const like = await Like.create({ userId, tweetId });
-      res.status(201).json({ message: 'Tweet liked successfully', like });
+      return res.status(201).json({ message: 'Beitrag geliked', like });
     } catch (error) {
-      res.status(500).json({ message: 'Error liking tweet', error });
+      return res.status(500).json({ message: 'Fehler beim Liken', error });
     }
   }
 
-  async unlikeTweet(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
+  async unlikeTweet(req: Request, res: Response): Promise<Response> {
+    const { userId, tweetId } = req.body;
 
     try {
-      await Like.destroy({ where: { id } });
-      res.status(200).json({ message: 'Tweet unliked successfully' });
+      const like = await Like.findOne({ where: { userId, tweetId } });
+
+      if (!like) return res.status(404).json({ message: 'Like nicht gefunden' });
+
+      await like.destroy();
+      return res.status(200).json({ message: 'Like entfernt' });
     } catch (error) {
-      res.status(500).json({ message: 'Error unliking tweet', error });
+      return res.status(500).json({ message: 'Fehler beim Entfernen des Likes', error });
     }
   }
 }

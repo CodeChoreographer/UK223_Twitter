@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { TweetComponent } from './tweet/tweet.component';
-import { FeedComponent } from './feed/feed.component';
+
 
 @Component({
   selector: 'app-root',

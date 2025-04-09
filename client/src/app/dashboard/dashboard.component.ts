@@ -1,86 +1,95 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
+import { TweetService } from '../services/tweet.service';
+import { ToastrService } from 'ngx-toastr';
+import { TweetFormComponent } from '../tweet-form/tweet-form.component'
+import { TweetListComponent } from '../tweet-list/tweet-list.component'
+import { MatDialog } from '@angular/material/dialog'
+import { EditTweetDialogComponent } from '../edit-tweet-dialog/edit-tweet-dialog.component'
+
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  standalone: true,
+  imports: [TweetFormComponent, TweetListComponent, EditTweetDialogComponent, ],
 })
 export class DashboardComponent implements OnInit {
-  tweetText = '';
-  message = '';
   tweets: any[] = [];
-  currentUser: { userId: number, username: string } | null = null;
+  currentUserId: number | null = null;
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(
+    private tweetService: TweetService,
+    private toastr: ToastrService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
-    this.decodeJWT();
-    this.loadTweets();
+    this.currentUserId = this.tweetService.getCurrentUserId();
+    this.reloadTweets();
   }
 
-  decodeJWT(): void {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded: any = jwtDecode(token);
-        this.currentUser = {
-          userId: decoded.userId,
-          username: decoded.username
-        };
-      } catch (e) {
-        console.error('JWT ungültig', e);
-        this.currentUser = null;
-      }
-    }
-  }
-
-  submitTweet(): void {
-    if (!this.currentUser) return;
-
-    const tweet = {
-      userId: this.currentUser.userId,
-      username: this.currentUser.username, // wichtig!
-      content: this.tweetText
-    };
-
-    this.http.post('/api/tweets/create', tweet).subscribe({
-      next: () => {
-        this.message = 'Beitrag erfolgreich erstellt!';
-        this.tweetText = '';
-        this.loadTweets();
-      },
-      error: () => {
-        this.message = 'Fehler beim Erstellen des Beitrags.';
-      }
+  reloadTweets(): void {
+    this.tweetService.getTweets().subscribe({
+      next: (data) => (this.tweets = data),
+      error: () => this.toastr.error('Fehler beim Laden der Beiträge'),
     });
   }
 
-  loadTweets(): void {
-    this.http.get<any[]>('/api/tweets').subscribe({
-      next: (data) => this.tweets = data.reverse(),
-      error: () => {
-        this.message = 'Fehler beim Laden der Beiträge.';
+  toggleLike(tweet: any): void {
+    if (tweet.likedByMe) {
+      this.tweetService.unlikeTweet(tweet.id).subscribe({
+        next: (res) => {
+          tweet.likedByMe = false;
+          tweet.likes = Math.max(0, tweet.likes - 1);
+          this.toastr.success(res.message);
+        },
+        error: () => this.toastr.error('Fehler beim Disliken'),
+      });
+    } else {
+      this.tweetService.likeTweet(tweet.id).subscribe({
+        next: (res) => {
+          tweet.likedByMe = true;
+          tweet.likes += 1;
+          this.toastr.success(res.message);
+        },
+        error: () => this.toastr.error('Fehler beim Liken'),
+      });
+    }
+  }
+
+  editTweet(tweet: any): void {
+    const dialogRef = this.dialog.open(EditTweetDialogComponent, {
+      data: { tweet },
+    });
+
+    dialogRef.afterClosed().subscribe((updatedTweet) => {
+      if (updatedTweet) {
+        const index = this.tweets.findIndex((t) => t.id === updatedTweet.id);
+        if (index > -1) {
+          this.tweets[index].content = updatedTweet.content;
+          this.toastr.success('Beitrag aktualisiert');
+        }
       }
     });
   }
-
-  likeTweet(tweetId: number): void {
-    console.log(`Tweet ${tweetId} wurde geliked.`);
-    const tweet = this.tweets.find(t => t.id === tweetId);
-    if (tweet) {
-      tweet.likes = (tweet.likes || 0) + 1;
+  deleteTweet(id: number): void {
+    if (confirm('Willst du diesen Beitrag wirklich löschen?')) {
+      this.tweetService.deleteTweet(id).subscribe({
+        next: () => {
+          this.toastr.success('Beitrag gelöscht');
+          this.tweets = this.tweets.filter((t) => t.id !== id);
+        },
+        error: () => this.toastr.error('Fehler beim Löschen'),
+      });
     }
+  }
+  editProfile(): void {
+    this.toastr.info('Profilbearbeitung noch nicht implementiert.');
   }
 
   logout(): void {
     localStorage.removeItem('token');
-    this.router.navigate(['/login']);
+    window.location.href = '/login';
   }
+
 }
