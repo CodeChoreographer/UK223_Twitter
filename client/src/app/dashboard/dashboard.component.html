@@ -1,46 +1,19 @@
-<!-- Navbar -->
-<nav class="navbar">
-    <div class="container">
-        <span class="logo">MiniTwitter</span>
-        <button class="logout" (click)="logout()">Logout</button>
-    </div>
+<nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
+  <span class="font-semibold text-lg">MiniTwitter</span>
+  <div class="flex gap-4">
+    <button class="hover:text-orange-400" (click)="editProfile()">Profil bearbeiten</button>
+    <button class="hover:text-red-400" (click)="logout()">Abmelden</button>
+  </div>
 </nav>
 
-<main class="dashboard-content">
-    <!-- Tweet erstellen -->
-    <section class="tweet-box">
-        <h3>Neuer Beitrag</h3>
-        <form (submit)="submitTweet()">
-      <textarea
-              [(ngModel)]="tweetText"
-              name="tweet"
-              required
-              placeholder="Was passiert gerade?"></textarea>
-            <br />
-            <button type="submit">Posten</button>
-        </form>
-        <p *ngIf="message">{{ message }}</p>
-    </section>
+<main class="max-w-2xl mx-auto mt-6 px-4">
+  <app-tweet-form (tweetCreated)="reloadTweets()"></app-tweet-form>
+  <app-tweet-list
+    [tweets]="tweets"
+    [currentUserId]="currentUserId"
+    (toggleLike)="toggleLike($event)"
+    (editTweet)="editTweet($event)"
+    (deleteTweet)="deleteTweet($event)"
+  ></app-tweet-list>
 
-    <hr />
-
-    <!-- Feed -->
-    <section class="feed" *ngIf="tweets.length > 0; else leer">
-        <div class="tweet-card" *ngFor="let tweet of tweets">
-            <div class="tweet-header">
-                <strong>{{ tweet.username || tweet.user?.username || 'Unbekannter Nutzer' }}</strong>
-            </div>
-            <div class="tweet-content">
-                <p>{{ tweet.content }}</p>
-            </div>
-            <div class="tweet-footer">
-                <button (click)="likeTweet(tweet.id)">❤️ Liken</button>
-                <span>{{ tweet.likes || 0 }} Likes</span>
-            </div>
-        </div>
-    </section>
-
-    <ng-template #leer>
-        <p style="text-align: center; color: gray;">Noch keine Beiträge vorhanden.</p>
-    </ng-template>
 </main>

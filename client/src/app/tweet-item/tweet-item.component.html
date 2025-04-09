@@ -1,0 +1,33 @@
+<article class="bg-gray-800 p-4 rounded-lg shadow">
+  <header class="flex justify-between items-center text-sm text-orange-400 mb-2">
+    <span>{{ tweet.user.username }}</span>
+    @if (tweet.userId === currentUserId) {
+      <span class="text-green-400">• du</span>
+    }
+  </header>
+
+  <p class="text-white whitespace-pre-line">{{ tweet.content }}</p>
+
+  <footer class="flex flex-wrap gap-4 text-sm text-gray-400 mt-4 items-center">
+    @if (tweet.userId === currentUserId) {
+      <button (click)="handleEdit()" class="hover:text-blue-400 transition">
+        ✏️ Bearbeiten
+      </button>
+      <button (click)="handleDelete()" class="hover:text-red-400 transition">
+        🗑️ Löschen
+      </button>
+    } @else {
+      <button (click)="handleLike()" class="hover:text-red-400 transition">
+        ❤️ {{ tweet.likedByMe ? 'Dislike' : 'Like' }}
+      </button>
+    }
+
+    <span>{{ tweet.likes }} Likes</span>
+
+    <span
+      class="ml-auto italic text-xs text-gray-500"
+      [title]="tweet.createdAt | date:'dd.MM.yyyy, HH:mm'">
+      {{ getRelativeTime(tweet.createdAt) }}
+    </span>
+  </footer>
+</article>
