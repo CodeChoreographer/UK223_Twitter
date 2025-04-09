@@ -4,7 +4,7 @@
 
   @if (errorCode === '404') {
     <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdDdneHV6ZmpqbTg0ZDE2cGY4YnIxcHg0c2JsNnl0MWZuNm9qMnV2bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lAHuuo2j6VCMg/giphy.gif" class="giphy-image" >
-    <button (click)="navigateTo('/')" class="button">Zur Startseite</button>
+    <button (click)="navigateTo('/login')" class="button">Zum Login</button>
   }
   @else if (errorCode === '403') {
     @if (!showEasterEgg) {

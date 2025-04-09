@@ -76,6 +76,8 @@ Notification.belongsTo(User, { foreignKey: 'userId' });
 
 User.belongsToMany(Role, { through: UserRole, foreignKey: 'userId' });
 Role.belongsToMany(User, { through: UserRole, foreignKey: 'roleId' });
+UserRole.belongsTo(Role, { foreignKey: 'roleId' });
+Role.hasMany(UserRole, { foreignKey: 'roleId' });
 
 Role.belongsToMany(Right, { through: RoleRight, foreignKey: 'roleId' });
 Right.belongsToMany(Role, { through: RoleRight, foreignKey: 'rightId' });

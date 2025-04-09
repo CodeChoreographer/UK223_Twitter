@@ -3,7 +3,7 @@ import { Comment } from '../database';
 
 export class CommentController {
 
-  async createComment(req: Request, res: Response): Promise<void> {
+  async addComment(req: Request, res: Response): Promise<void> {
     const { userId, tweetId, content } = req.body;
 
     try {
