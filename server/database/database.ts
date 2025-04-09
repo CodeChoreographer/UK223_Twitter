@@ -22,7 +22,7 @@ export class Database {
       console.log('✅ Verbindung zur Datenbank erfolgreich hergestellt.');
 
       await sequelize.sync({ alter: true });
-      console.log('✅ Datenbank ist aktuell.');
+      console.log('✅ Datenbanktabellen erfolgreich synchronisiert.');
 
     } catch (error) {
       console.error('❌ Fehler beim Verbinden mit der Datenbank:', error);
