@@ -72,5 +72,31 @@ export class UserController {
     }
   }
 
-  async updateProfile(req: Request, res: Response) { }
+  async updateProfile(req: Request, res: Response) {
+    const { id, username, password } = req.body;
+
+    if (!id || !username || !password) {
+      return res.status(400).json({ message: 'Fehlende Felder' });
+    }
+
+    try {
+      const user = await User.findByPk(id);
+      if (!user) {
+        return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      await user.update({
+        username,
+        password: hashedPassword
+      });
+
+      return res.status(200).json({ message: 'Profil erfolgreich aktualisiert' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Fehler beim Aktualisieren des Profils' });
+    }
+  }
+
 }
