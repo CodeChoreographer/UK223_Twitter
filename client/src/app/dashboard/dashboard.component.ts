@@ -33,6 +33,7 @@ export class DashboardComponent implements OnInit {
   reloadTweets(): void {
     this.tweetService.getTweets().subscribe({
       next: (data) => {
+
         this.tweets = data;
       },
       error: () => this.toastr.error('Fehler beim Laden der Beiträge'),
@@ -66,6 +67,7 @@ export class DashboardComponent implements OnInit {
       });
     }
   }
+
 
   editTweet(tweet: any): void {
     const dialogRef = this.dialog.open(EditTweetDialogComponent, {

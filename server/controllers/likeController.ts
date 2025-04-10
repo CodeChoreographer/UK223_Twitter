@@ -15,11 +15,17 @@ export class LikeController {
       const existing = await Like.findOne({ where: { userId, tweetId } });
 
       if (existing) {
-        return res.status(200).json({ message: 'Tweet bereits geliked', liked: false });
+        return res.status(200).json({
+          message: 'Tweet bereits geliked',
+          liked: false,
+        });
       }
 
       await Like.create({ userId, tweetId });
-      return res.status(201).json({ message: 'Beitrag geliked', liked: true });
+      return res.status(201).json({
+        message: 'Beitrag geliked',
+        liked: true,
+      });
     } catch (error) {
       return res.status(500).json({ message: 'Fehler beim Liken', error });
     }
