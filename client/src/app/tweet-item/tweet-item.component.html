@@ -36,4 +36,10 @@
       {{ getRelativeTime(tweet.createdAt) }}
     </span>
   </footer>
+  <div class="mt-4 border-t border-gray-600 pt-4">
+    <app-comment-list
+      [tweetId]="tweet.id"
+      [currentUserId]="currentUserId"
+    />
+  </div>
 </article>
