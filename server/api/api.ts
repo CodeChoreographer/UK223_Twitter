@@ -34,6 +34,8 @@ export class API {
 
     this.app.post('/api/users/register', this.userController.register.bind(this.userController));
     this.app.post('/api/users/login', this.userController.login.bind(this.userController));
+    this.app.put('/api/users/update', authenticateToken, this.userController.updateProfile.bind(this.userController));
+
 
     this.app.get('/api/tweets', requireAuth, this.tweetController.getAllTweets.bind(this.tweetController));
     this.app.post('/api/tweets/create', requireAuth, requireRole('user', 'moderator', 'admin'), this.tweetController.createTweet.bind(this.tweetController));

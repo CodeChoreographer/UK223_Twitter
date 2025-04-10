@@ -5,6 +5,7 @@ import { TweetFormComponent } from '../tweet-form/tweet-form.component';
 import { TweetListComponent } from '../tweet-list/tweet-list.component';
 import { MatDialog } from '@angular/material/dialog';
 import { EditTweetDialogComponent } from '../edit-tweet-dialog/edit-tweet-dialog.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,7 +23,8 @@ export class DashboardComponent implements OnInit {
   constructor(
     private tweetService: TweetService,
     private toastr: ToastrService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -98,7 +100,7 @@ export class DashboardComponent implements OnInit {
   }
 
   editProfile(): void {
-    this.toastr.info('Profilbearbeitung noch nicht implementiert.');
+    this.router.navigate(['/profile']);
   }
 
   logout(): void {

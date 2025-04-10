@@ -11,6 +11,13 @@ export const appRoutes: Routes = [
     loadComponent: () =>
         import('./register/register.component').then((m) => m.RegisterComponent),
   },
+
+  {
+    path: 'profile',
+    loadComponent: () => import('./edit-profile/edit-profile.component').then(m => m.EditProfileComponent
+    )
+  },
+
   {
     path: 'login',
     loadComponent: () =>
