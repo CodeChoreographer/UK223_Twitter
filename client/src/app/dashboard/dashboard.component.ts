@@ -30,7 +30,10 @@ export class DashboardComponent implements OnInit {
 
   reloadTweets(): void {
     this.tweetService.getTweets().subscribe({
-      next: (data) => (this.tweets = data),
+      next: (data) => {
+        console.log('GELADENE TWEETS:', data);
+        this.tweets = data;
+      },
       error: () => this.toastr.error('Fehler beim Laden der Beiträge'),
     });
   }
@@ -39,23 +42,30 @@ export class DashboardComponent implements OnInit {
     if (tweet.likedByMe) {
       this.tweetService.unlikeTweet(tweet.id).subscribe({
         next: (res) => {
-          tweet.likedByMe = false;
-          tweet.likes = Math.max(0, tweet.likes - 1);
-          this.toastr.success(res.message);
+          if (res.liked === false) {
+            tweet.likedByMe = false;
+            tweet.likes = Math.max(0, tweet.likes - 1);
+            this.toastr.success(res.message);
+          }
         },
         error: () => this.toastr.error('Fehler beim Disliken'),
       });
     } else {
       this.tweetService.likeTweet(tweet.id).subscribe({
         next: (res) => {
-          tweet.likedByMe = true;
-          tweet.likes += 1;
-          this.toastr.success(res.message);
+          if (res.liked === true) {
+            tweet.likedByMe = true;
+            tweet.likes += 1;
+            this.toastr.success(res.message);
+          } else {
+            this.toastr.info('Du hast diesen Beitrag bereits geliked.');
+          }
         },
         error: () => this.toastr.error('Fehler beim Liken'),
       });
     }
   }
+
 
   editTweet(tweet: any): void {
     const dialogRef = this.dialog.open(EditTweetDialogComponent, {
