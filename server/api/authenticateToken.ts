@@ -5,16 +5,17 @@ export interface AuthenticatedRequest extends Request {
   user?: any;
 }
 
-export function authenticateToken(req: Request, res: Response, next: NextFunction) {
-  const token = req.headers.authorization?.split(' ')[1];
+export function authenticateToken(req: Request, res: Response, next: NextFunction): void {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.split(' ')[1];
 
-  if (!token) return res.sendStatus(401);
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    (req as AuthenticatedRequest).user = decoded;
-    next();
-  } catch (err) {
-    return res.sendStatus(403);
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      (req as AuthenticatedRequest).user = decoded;
+    } catch (err) {
+    }
   }
+
+  next();
 }
