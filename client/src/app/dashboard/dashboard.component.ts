@@ -1,17 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { TweetService } from '../services/tweet.service';
 import { ToastrService } from 'ngx-toastr';
-import { TweetFormComponent } from '../tweet-form/tweet-form.component'
-import { TweetListComponent } from '../tweet-list/tweet-list.component'
-import { MatDialog } from '@angular/material/dialog'
-import { EditTweetDialogComponent } from '../edit-tweet-dialog/edit-tweet-dialog.component'
-
+import { TweetFormComponent } from '../tweet-form/tweet-form.component';
+import { TweetListComponent } from '../tweet-list/tweet-list.component';
+import { MatDialog } from '@angular/material/dialog';
+import { EditTweetDialogComponent } from '../edit-tweet-dialog/edit-tweet-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   standalone: true,
-  imports: [TweetFormComponent, TweetListComponent, EditTweetDialogComponent, ],
+  imports: [
+    TweetFormComponent,
+    TweetListComponent,
+  ]
 })
 export class DashboardComponent implements OnInit {
   tweets: any[] = [];
@@ -31,7 +33,6 @@ export class DashboardComponent implements OnInit {
   reloadTweets(): void {
     this.tweetService.getTweets().subscribe({
       next: (data) => {
-        console.log('GELADENE TWEETS:', data);
         this.tweets = data;
       },
       error: () => this.toastr.error('Fehler beim Laden der Beiträge'),
@@ -66,7 +67,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-
   editTweet(tweet: any): void {
     const dialogRef = this.dialog.open(EditTweetDialogComponent, {
       data: { tweet },
@@ -82,6 +82,7 @@ export class DashboardComponent implements OnInit {
       }
     });
   }
+
   deleteTweet(id: number): void {
     if (confirm('Willst du diesen Beitrag wirklich löschen?')) {
       this.tweetService.deleteTweet(id).subscribe({
@@ -93,6 +94,7 @@ export class DashboardComponent implements OnInit {
       });
     }
   }
+
   editProfile(): void {
     this.toastr.info('Profilbearbeitung noch nicht implementiert.');
   }
@@ -101,5 +103,4 @@ export class DashboardComponent implements OnInit {
     localStorage.removeItem('token');
     window.location.href = '/login';
   }
-
 }

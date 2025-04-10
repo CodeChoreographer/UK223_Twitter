@@ -1,0 +1,17 @@
+<form (submit)="submitComment()" class="space-y-2">
+  <textarea
+    [(ngModel)]="content"
+    name="comment"
+    required
+    placeholder="Schreibe einen Kommentar..."
+    class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
+    rows="2"
+  ></textarea>
+
+  <button
+    type="submit"
+    class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-1 px-4 rounded text-sm"
+  >
+    Kommentieren
+  </button>
+</form>

@@ -8,12 +8,14 @@
 
 <main class="max-w-2xl mx-auto mt-6 px-4">
   <app-tweet-form (tweetCreated)="reloadTweets()"></app-tweet-form>
-  <app-tweet-list
-    [tweets]="tweets"
-    [currentUserId]="currentUserId"
-    (toggleLike)="toggleLike($event)"
-    (editTweet)="editTweet($event)"
-    (deleteTweet)="deleteTweet($event)"
-  ></app-tweet-list>
 
+  @if (currentUserId !== null) {
+    <app-tweet-list
+      [tweets]="tweets"
+      [currentUserId]="currentUserId"
+      (toggleLike)="toggleLike($event)"
+      (editTweet)="editTweet($event)"
+      (deleteTweet)="deleteTweet($event)"
+    />
+  }
 </main>

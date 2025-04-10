@@ -10,7 +10,7 @@ import { TweetItemComponent } from '../tweet-item/tweet-item.component'
 })
 export class TweetListComponent {
   @Input() tweets: any[] = [];
-  @Input() currentUserId: number | null = null;
+  @Input() currentUserId!: number;
 
   @Output() toggleLike = new EventEmitter<any>();
 
