@@ -14,32 +14,24 @@ export class TweetService {
   }
 
   createTweet(content: string): Observable<any> {
-    const token = localStorage.getItem('token');
-    return this.http.post('/api/tweets/create', { content }, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-  }
-
-
-  deleteTweet(id: number): Observable<any> {
-    return this.http.delete(`/api/tweets/delete/${id}`);
+    return this.http.post('/api/tweets/create', { content });
   }
 
   editTweet(id: number, content: string): Observable<any> {
     return this.http.put('/api/tweets/edit', { id, content });
   }
 
+  deleteTweet(id: number): Observable<any> {
+    return this.http.delete(`/api/tweets/delete/${id}`);
+  }
+
   likeTweet(tweetId: number): Observable<any> {
-    const userId = this.getCurrentUserId();
-    return this.http.post('/api/likes/like', { userId, tweetId });
+    return this.http.post('/api/likes/like', { tweetId });
   }
 
   unlikeTweet(tweetId: number): Observable<any> {
-    const userId = this.getCurrentUserId();
     return this.http.request('delete', '/api/likes/unlike', {
-      body: { userId, tweetId },
+      body: { tweetId }
     });
   }
 

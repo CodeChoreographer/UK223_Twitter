@@ -20,8 +20,7 @@ export class TweetController {
   }
 
   async getAllTweets(req: AuthenticatedRequest, res: Response): Promise<Response> {
-    const currentUserId = req.user?.id;
-
+    const currentUserId = req.user?.userId;
     try {
       const tweets = await Tweet.findAll({
         include: [
