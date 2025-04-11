@@ -27,7 +27,6 @@ export const appRoutes: Routes = [
     canActivate: [AuthGuard, AdminGuard]
   },
 
-
   {
     path: 'login',
     loadComponent: () =>

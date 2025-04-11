@@ -7,7 +7,6 @@ import { AdminController } from '../controllers/adminController';
 import { TweetController } from '../controllers/tweetController';
 import { CommentController } from '../controllers/commentController';
 import { LikeController } from '../controllers/likeController';
-import { NotificationController } from '../controllers/notificationController';
 import { requireTweetPermission } from './requireTweetPermission';
 import { requireCommentPermission } from './requireCommentPermission';
 import { requireProfilePermission } from './requireProfilePermission';
@@ -21,7 +20,6 @@ export class API {
   private tweetController: TweetController;
   private commentController: CommentController;
   private likeController: LikeController;
-  private notificationController: NotificationController;
 
   constructor(app: Express) {
     this.app = app;
@@ -31,7 +29,6 @@ export class API {
     this.tweetController = new TweetController();
     this.commentController = new CommentController();
     this.likeController = new LikeController();
-    this.notificationController = new NotificationController();
 
     this.setupRoutes();
   }
@@ -76,10 +73,6 @@ export class API {
     this.app.delete('/api/likes/unlike', requireAuth, requireRole('user', 'moderator', 'admin'), this.likeController.unlikeTweet.bind(this.likeController));
     this.app.post('/api/likes/comment/like', requireAuth, this.likeController.likeComment.bind(this.likeController));
     this.app.delete('/api/likes/comment/unlike', requireAuth, this.likeController.unlikeComment.bind(this.likeController));
-
-    // NOTIFICATIONS
-    this.app.post('/api/notifications/send', requireAuth, requireRole('admin'), this.notificationController.sendNotification.bind(this.notificationController));
-    this.app.put('/api/notifications/mark-as-read/:id', requireAuth, this.notificationController.markAsRead.bind(this.notificationController));
 
     // ADMINSPACE
     this.app.get(
