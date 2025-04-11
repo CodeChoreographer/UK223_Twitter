@@ -27,7 +27,7 @@ export class RegisterComponent {
       next: () => {
         this.notify.success('Erfolgreich registriert!');
         setTimeout(() => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/login']);
         }, 1500);
       },
       error: (err) => {
