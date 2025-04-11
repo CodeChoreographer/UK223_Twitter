@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import { AuthPayload } from '../types/auth';
 
 export interface AuthenticatedRequest extends Request {
-  user?: any;}
+  user?: AuthPayload;
+}
 
 export function authenticateToken(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
@@ -10,7 +12,7 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as AuthPayload;
       (req as AuthenticatedRequest).user = decoded;
     } catch (err) {
     }
