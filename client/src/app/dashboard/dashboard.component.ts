@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { TweetService } from '../services/tweet.service';
 import { ToastrService } from 'ngx-toastr';
 import { TweetFormComponent } from '../tweet-form/tweet-form.component';
@@ -6,6 +6,7 @@ import { TweetListComponent } from '../tweet-list/tweet-list.component';
 import { MatDialog } from '@angular/material/dialog';
 import { EditTweetDialogComponent } from '../edit-tweet-dialog/edit-tweet-dialog.component';
 import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,23 +20,25 @@ import { Router } from '@angular/router';
 export class DashboardComponent implements OnInit {
   tweets: any[] = [];
   currentUserId: number | null = null;
+  userRoles: string[] = [];
 
   constructor(
     private tweetService: TweetService,
     private toastr: ToastrService,
     private dialog: MatDialog,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.currentUserId = this.tweetService.getCurrentUserId();
+    this.currentUserId = this.authService.getUserId();
+    this.userRoles = this.authService.getUserRoles();
     this.reloadTweets();
   }
 
   reloadTweets(): void {
     this.tweetService.getTweets().subscribe({
       next: (data) => {
-
         this.tweets = data;
       },
       error: () => this.toastr.error('Fehler beim Laden der Beiträge'),
@@ -70,7 +73,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-
   editTweet(tweet: any): void {
     const dialogRef = this.dialog.open(EditTweetDialogComponent, {
       data: { tweet },
@@ -104,7 +106,6 @@ export class DashboardComponent implements OnInit {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
+    this.authService.logout();
   }
 }

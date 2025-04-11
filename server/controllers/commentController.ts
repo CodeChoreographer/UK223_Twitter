@@ -55,16 +55,11 @@ export class CommentController {
   }
 
   async editComment(req: AuthenticatedRequest, res: Response): Promise<Response> {
-    const userId = req.user?.userId;
     const { id, content } = req.body;
 
     try {
       const comment = await Comment.findByPk(id);
       if (!comment) return res.status(404).json({ message: 'Kommentar nicht gefunden' });
-
-      if (comment.userId !== userId) {
-        return res.status(403).json({ message: 'Keine Berechtigung zum Bearbeiten' });
-      }
 
       await Comment.update({ content }, { where: { id } });
       return res.status(200).json({ message: 'Kommentar bearbeitet' });
@@ -73,6 +68,7 @@ export class CommentController {
     }
   }
 
+
   async deleteComment(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const commentId = req.params.id;
     const userId = req.user?.userId;
@@ -80,10 +76,6 @@ export class CommentController {
     try {
       const comment = await Comment.findByPk(commentId);
       if (!comment) return res.status(404).json({ message: 'Kommentar nicht gefunden' });
-
-      if (comment.userId !== userId) {
-        return res.status(403).json({ message: 'Keine Berechtigung zum Löschen' });
-      }
 
       await comment.destroy();
       return res.status(200).json({ message: 'Kommentar gelöscht' });

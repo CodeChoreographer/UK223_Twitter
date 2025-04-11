@@ -16,6 +16,7 @@
     <app-tweet-list
       [tweets]="tweets"
       [currentUserId]="currentUserId"
+      [userRoles]="userRoles"
       (toggleLike)="toggleLike($event)"
       (editTweet)="editTweet($event)"
       (deleteTweet)="deleteTweet($event)"

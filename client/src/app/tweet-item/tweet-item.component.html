@@ -9,7 +9,7 @@
   <p class="text-white whitespace-pre-line">{{ tweet.content }}</p>
 
   <footer class="flex flex-wrap gap-4 text-sm text-gray-400 mt-4 items-center">
-    @if (tweet.userId === currentUserId) {
+    @if (isOwnerOrModeratorOrAdmin) {
       <button (click)="handleEdit()" class="hover:text-blue-400 transition">
         ✏️ Bearbeiten
       </button>
@@ -47,6 +47,7 @@
         <app-comment-list
           [tweetId]="tweet.id"
           [currentUserId]="currentUserId"
+          [userRoles]="userRoles"
         />
       }
     }

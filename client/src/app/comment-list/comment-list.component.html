@@ -40,7 +40,7 @@
           {{ comment.likedByMe ? '❤️ You Love it' : '🤍 You like it?' }} {{ comment.likes + ' Likes' }}
         </button>
 
-        @if (comment.userId === currentUserId && editingCommentId !== comment.id) {
+        @if (isOwnerOrModeratorOrAdmin(comment) && editingCommentId !== comment.id) {
           <button (click)="startEdit(comment)" class="hover:text-blue-400 transition">
             ✏️ Bearbeiten
           </button>

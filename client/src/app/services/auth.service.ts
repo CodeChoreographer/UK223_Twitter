@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode'
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -27,5 +28,26 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem('token');
+  }
+
+  getUserId(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    const decoded: any = jwtDecode(token);
+    return decoded.userId ?? null;
+  }
+
+  getUsername(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    const decoded: any = jwtDecode(token);
+    return decoded.username ?? null;
+  }
+
+  getUserRoles(): string[] {
+    const token = this.getToken();
+    if (!token) return [];
+    const decoded: any = jwtDecode(token);
+    return decoded.roles || [];
   }
 }

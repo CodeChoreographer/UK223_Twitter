@@ -18,6 +18,8 @@ import { FormsModule } from '@angular/forms';
 export class CommentListComponent implements OnInit {
   @Input() tweetId!: number;
   @Input() currentUserId!: number;
+  @Input() userRoles: string[] = [];
+
 
   comments: any[] = [];
   editingCommentId: number | null = null;
@@ -27,6 +29,14 @@ export class CommentListComponent implements OnInit {
     private commentService: CommentService,
     private toastr: ToastrService
   ) {}
+
+  isOwnerOrModeratorOrAdmin(comment: any): boolean {
+    return (
+      comment.userId === this.currentUserId ||
+      this.userRoles.includes('moderator') ||
+      this.userRoles.includes('admin')
+    );
+  }
 
   ngOnInit(): void {
     this.loadComments();
