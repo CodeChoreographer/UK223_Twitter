@@ -40,6 +40,10 @@ export class UserController {
         return res.status(401).json({ message: 'Benutzer nicht gefunden' })
       }
 
+      if (!user.getDataValue('isActive')) {
+        return res.status(403).json({ message: 'Benutzerkonto ist gesperrt' });
+      }
+
       const isPasswordValid = await bcrypt.compare(password, user.getDataValue('password'))
       if (!isPasswordValid) {
         return res.status(401).json({ message: 'Falsches Passwort' })

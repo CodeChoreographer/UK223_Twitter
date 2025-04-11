@@ -68,7 +68,6 @@ export class CommentController {
     }
   }
 
-
   async deleteComment(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const commentId = req.params.id;
     const userId = req.user?.userId;

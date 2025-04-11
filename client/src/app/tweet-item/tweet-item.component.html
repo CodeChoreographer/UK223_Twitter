@@ -10,21 +10,20 @@
 
   <footer class="flex flex-wrap gap-4 text-sm text-gray-400 mt-4 items-center">
     @if (isOwnerOrModeratorOrAdmin) {
-      <button (click)="handleEdit()" class="hover:text-blue-400 transition">
-        ✏️ Bearbeiten
-      </button>
-      <button (click)="handleDelete()" class="hover:text-red-400 transition">
-        🗑️ Löschen
-      </button>
-    } @else {
-      <button (click)="likeClicked.emit(tweet)"
-              [ngClass]="{
-                'text-red-500 scale-125 transition-transform duration-200 ease-in-out': tweet.likedByMe,
-                'text-gray-400': !tweet.likedByMe
-              }">
-        {{ tweet.likedByMe ? '❤️ You Love This' : '🤍 You Like this?' }}
-      </button>
+      <button (click)="handleEdit()">✏️ Bearbeiten</button>
+      <button (click)="handleDelete()">🗑️ Löschen</button>
     }
+
+    <!-- Like-Button immer anzeigen -->
+    <button
+      (click)="likeClicked.emit(tweet)"
+      [ngClass]="{
+    'text-red-500 scale-125 transition-transform duration-200 ease-in-out': tweet.likedByMe,
+    'text-gray-400': !tweet.likedByMe
+  }"
+    >
+      {{ tweet.likedByMe ? '❤️ You Love This' : '🤍 You Like this?' }}
+    </button>
 
     <span>{{ tweet.likes }} Likes</span>
 

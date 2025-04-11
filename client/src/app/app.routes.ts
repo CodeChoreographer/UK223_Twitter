@@ -19,6 +19,13 @@ export const appRoutes: Routes = [
   },
 
   {
+    path: 'admin',
+    loadComponent: () =>
+      import('./admin-management/admin-management.component').then(m => m.AdminManagementComponent),
+  },
+
+
+  {
     path: 'login',
     loadComponent: () =>
         import('./login/login.component').then((m) => m.LoginComponent),

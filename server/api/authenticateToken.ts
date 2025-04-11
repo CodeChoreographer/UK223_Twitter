@@ -2,8 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
 export interface AuthenticatedRequest extends Request {
-  user?: any;
-}
+  user?: any;}
 
 export function authenticateToken(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;

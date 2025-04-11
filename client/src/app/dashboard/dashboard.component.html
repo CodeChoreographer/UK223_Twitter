@@ -4,6 +4,9 @@
 <nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
   <span class="font-semibold text-lg">MiniTwitter</span>
   <div class="flex gap-4">
+    @if (userRoles.includes('admin')) {
+      <a routerLink="/admin" class="text-orange-400 underline">🔧 Admin-Bereich</a>
+    }
     <button class="hover:text-orange-400" (click)="editProfile()">Profil bearbeiten</button>
     <button class="hover:text-red-400" (click)="logout()">Abmelden</button>
   </div>
