@@ -3,6 +3,7 @@
     <app-tweet-item
       [tweet]="tweet"
       [currentUserId]="currentUserId"
+      [userRoles]="userRoles"
       (likeClicked)="handleLike($event)"
       (editClicked)="handleEdit($event)"
       (deleteClicked)="handleDelete($event)"

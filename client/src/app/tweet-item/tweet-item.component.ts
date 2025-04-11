@@ -4,7 +4,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { CommentListComponent } from '../comment-list/comment-list.component'
+import { CommentListComponent } from '../comment-list/comment-list.component';
 
 @Component({
   selector: 'app-tweet-item',
@@ -15,6 +15,7 @@ import { CommentListComponent } from '../comment-list/comment-list.component'
 export class TweetItemComponent {
   @Input() tweet!: any;
   @Input() currentUserId!: number;
+  @Input() userRoles: string[] = [];
 
   @Output() likeClicked = new EventEmitter<any>()
   @Output() editClicked = new EventEmitter<any>()
@@ -49,5 +50,13 @@ export class TweetItemComponent {
     } else {
       this.showComments = false;
     }
+  }
+
+  get isOwnerOrModeratorOrAdmin(): boolean {
+    return (
+      this.tweet.userId === this.currentUserId ||
+      this.userRoles.includes('moderator') ||
+      this.userRoles.includes('admin')
+    );
   }
 }

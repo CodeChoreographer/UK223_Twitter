@@ -15,12 +15,14 @@ export class TweetController {
       const tweet = await Tweet.create({ userId, content });
       return res.status(201).json({ message: 'Beitrag erfolgreich gepostet', tweet });
     } catch (error) {
+      console.error(error);
       return res.status(500).json({ message: 'Fehler beim Erstellen des Beitrags', error });
     }
   }
 
   async getAllTweets(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const currentUserId = req.user?.userId;
+
     try {
       const tweets = await Tweet.findAll({
         include: [
@@ -47,6 +49,7 @@ export class TweetController {
 
       return res.status(200).json(result);
     } catch (error) {
+      console.error(error);
       return res.status(500).json({ message: 'Fehler beim Laden der Beiträge', error });
     }
   }
@@ -54,21 +57,43 @@ export class TweetController {
   async editTweet(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const { id, content } = req.body;
 
+    if (!id || !content) {
+      return res.status(400).json({ message: 'Tweet-ID oder Inhalt fehlt' });
+    }
+
     try {
-      await Tweet.update({ content }, { where: { id } });
+      const tweet = await Tweet.findByPk(id);
+      if (!tweet) {
+        return res.status(404).json({ message: 'Tweet nicht gefunden' });
+      }
+
+      await tweet.update({ content });
+
       return res.status(200).json({ message: 'Beitrag erfolgreich bearbeitet' });
     } catch (error) {
+      console.error(error);
       return res.status(500).json({ message: 'Fehler beim Bearbeiten des Beitrags', error });
     }
   }
 
   async deleteTweet(req: AuthenticatedRequest, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
+
+    if (!id || isNaN(id)) {
+      return res.status(400).json({ message: 'Ungültige Tweet-ID' });
+    }
 
     try {
-      await Tweet.destroy({ where: { id } });
+      const tweet = await Tweet.findByPk(id);
+      if (!tweet) {
+        return res.status(404).json({ message: 'Tweet nicht gefunden' });
+      }
+
+      await tweet.destroy();
+
       return res.status(200).json({ message: 'Beitrag erfolgreich gelöscht' });
     } catch (error) {
+      console.error(error);
       return res.status(500).json({ message: 'Fehler beim Löschen des Beitrags', error });
     }
   }
