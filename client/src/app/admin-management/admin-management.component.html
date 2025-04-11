@@ -1,0 +1,87 @@
+<button
+  routerLink="/dashboard"
+  class="mb-4 inline-flex items-center text-orange-400 hover:text-orange-300 text-sm"
+>
+  ← Zurück zum Dashboard
+</button>
+
+<h2 class="text-2xl font-semibold mb-6 text-orange-400">Benutzerverwaltung</h2>
+
+<div class="overflow-x-auto bg-gray-800 rounded-xl shadow-xl p-4">
+  <table class="min-w-full text-sm text-gray-200">
+    <thead>
+    <tr class="border-b border-gray-700 text-orange-400 uppercase text-xs tracking-wider">
+      <th class="text-left p-3">Benutzername</th>
+      <th class="text-left p-3">Rollen</th>
+      <th class="text-left p-3">Aktionen</th>
+    </tr>
+    </thead>
+    <tbody>
+      @for (user of users; track user.id) {
+        <tr class="border-b border-gray-700 hover:bg-gray-700 transition-colors">
+          <td class="p-3 font-medium text-white flex items-center gap-2">
+            {{ user.username }}
+            <span
+              class="px-2 py-0.5 rounded-full text-xs font-semibold"
+              [ngClass]="{
+                'bg-green-700 text-green-100': user.isActive,
+                'bg-red-700 text-red-100': !user.isActive
+              }"
+            >
+              {{ user.isActive ? 'aktiv' : 'gesperrt' }}
+            </span>
+          </td>
+          <td class="p-3">
+            @for (role of user.Roles; track role.id) {
+              <span class="inline-flex items-center bg-gray-900 border border-gray-600 rounded-full px-3 py-1 mr-2 mb-1 text-xs">
+                {{ role.name }}
+                <button
+                  (click)="removeRole(user.id, role.id)"
+                  class="ml-2 text-red-400 hover:text-red-300 focus:outline-none"
+                >
+                  ×
+                </button>
+              </span>
+            }
+          </td>
+          <td class="p-3 flex flex-col md:flex-row items-start md:items-center gap-2">
+            <select
+              class="bg-gray-900 border border-gray-600 px-3 py-1 rounded text-white text-sm"
+              [(ngModel)]="selectedRole[user.id]"
+            >
+              <option disabled selected [ngValue]="undefined">Rolle auswählen</option>
+              @for (role of availableRoles; track role) {
+                <option [value]="role">{{ role }}</option>
+              }
+            </select>
+
+            <button
+              (click)="assignRole(user.id)"
+              class="bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded text-white text-sm transition"
+            >
+              Hinzufügen
+            </button>
+
+            <button
+              (click)="toggleActive(user.id)"
+              class="px-3 py-1 rounded text-white text-sm transition"
+              [ngClass]="{
+                'bg-red-600 hover:bg-red-700': user.isActive,
+                'bg-green-600 hover:bg-green-700': !user.isActive
+              }"
+            >
+              {{ user.isActive ? 'Sperren' : 'Freigeben' }}
+            </button>
+            <button
+              (click)="deleteUser(user.id)"
+              class="bg-red-700 hover:bg-red-800 px-3 py-1 rounded text-white text-sm transition"
+            >
+              Löschen
+            </button>
+
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

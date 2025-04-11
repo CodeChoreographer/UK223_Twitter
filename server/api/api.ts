@@ -3,6 +3,7 @@ import { requireAuth } from './requireAuth';
 import { requireRole } from './requireRole';
 
 import { UserController } from '../controllers/userController';
+import { AdminController } from '../controllers/adminController';
 import { TweetController } from '../controllers/tweetController';
 import { CommentController } from '../controllers/commentController';
 import { LikeController } from '../controllers/likeController';
@@ -16,6 +17,7 @@ export class API {
   private app: Express;
 
   private userController: UserController;
+  private adminController: AdminController;
   private tweetController: TweetController;
   private commentController: CommentController;
   private likeController: LikeController;
@@ -25,6 +27,7 @@ export class API {
     this.app = app;
 
     this.userController = new UserController();
+    this.adminController = new AdminController();
     this.tweetController = new TweetController();
     this.commentController = new CommentController();
     this.likeController = new LikeController();
@@ -77,5 +80,43 @@ export class API {
     // NOTIFICATIONS
     this.app.post('/api/notifications/send', requireAuth, requireRole('admin'), this.notificationController.sendNotification.bind(this.notificationController));
     this.app.put('/api/notifications/mark-as-read/:id', requireAuth, this.notificationController.markAsRead.bind(this.notificationController));
+
+    // ADMINSPACE
+    this.app.get(
+      '/api/admin/users',
+      requireAuth,
+      requireRole('admin'),
+      this.adminController.getAllUsers.bind(this.adminController)
+    );
+
+    this.app.post(
+      '/api/admin/users/:id/roles',
+      requireAuth,
+      requireRole('admin'),
+      this.adminController.addRoleToUser.bind(this.adminController)
+    );
+
+    this.app.delete(
+      '/api/admin/users/:id/roles/:roleId',
+      requireAuth,
+      requireRole('admin'),
+      this.adminController.removeRoleFromUser.bind(this.adminController)
+    );
+    this.app.put(
+      '/api/admin/users/:id/toggle-active',
+      requireAuth,
+      requireRole('admin'),
+      this.adminController.toggleUserActive.bind(this.adminController)
+    );
+    this.app.delete(
+      '/api/admin/users/:id',
+      requireAuth,
+      requireRole('admin'),
+      this.adminController.deleteUser.bind(this.adminController)
+    );
+
+
+
+
   }
 }
