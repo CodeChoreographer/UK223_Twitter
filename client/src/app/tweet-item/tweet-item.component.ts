@@ -1,4 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component, Input, Output, EventEmitter
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -14,10 +16,12 @@ export class TweetItemComponent {
   @Input() tweet!: any;
   @Input() currentUserId!: number;
 
-
   @Output() likeClicked = new EventEmitter<any>()
   @Output() editClicked = new EventEmitter<any>()
   @Output() deleteClicked = new EventEmitter<number>()
+
+  showComments = false;
+  loadingComments = false;
 
   handleLike(): void {
     this.likeClicked.emit(this.tweet)
@@ -33,5 +37,17 @@ export class TweetItemComponent {
 
   getRelativeTime(date: string): string {
     return formatDistanceToNow(new Date(date), { addSuffix: true, locale: de })
+  }
+
+  toggleComments(): void {
+    if (!this.showComments) {
+      this.loadingComments = true;
+      setTimeout(() => {
+        this.loadingComments = false;
+        this.showComments = true;
+      }, 300);
+    } else {
+      this.showComments = false;
+    }
   }
 }

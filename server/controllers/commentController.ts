@@ -30,7 +30,7 @@ export class CommentController {
           { model: User, attributes: ['id', 'username'] },
           { model: Like, attributes: ['userId'] }
         ],
-        order: [['createdAt', 'ASC']]
+        order: [['createdAt', 'DESC']]
       });
 
       const result = comments.map((comment: any) => {

@@ -1,4 +1,4 @@
-<article class="bg-gray-800 p-4 rounded-lg shadow mb-4">
+<article class="bg-gray-800 p-4 rounded-lg shadow">
   <header class="flex justify-between items-center text-sm text-orange-400 mb-2">
     <span>{{ tweet.user.username }}</span>
     @if (tweet.userId === currentUserId) {
@@ -19,27 +19,36 @@
     } @else {
       <button (click)="likeClicked.emit(tweet)"
               [ngClass]="{
-    'text-red-500 scale-125 transition-transform duration-200 ease-in-out': tweet.likedByMe,
-    'text-gray-400': !tweet.likedByMe
-  }"
-      >
+                'text-red-500 scale-125 transition-transform duration-200 ease-in-out': tweet.likedByMe,
+                'text-gray-400': !tweet.likedByMe
+              }">
         {{ tweet.likedByMe ? '❤️ You Love This' : '🤍 You Like this?' }}
       </button>
-
     }
 
     <span>{{ tweet.likes }} Likes</span>
 
-    <span
-      class="ml-auto italic text-xs text-gray-500"
-      [title]="tweet.createdAt | date:'dd.MM.yyyy, HH:mm'">
+    <span class="ml-auto italic text-xs text-gray-500" [title]="tweet.createdAt | date:'dd.MM.yyyy, HH:mm'">
       {{ getRelativeTime(tweet.createdAt) }}
     </span>
   </footer>
+
   <div class="mt-4 border-t border-gray-600 pt-4">
-    <app-comment-list
-      [tweetId]="tweet.id"
-      [currentUserId]="currentUserId"
-    />
+    <button (click)="toggleComments()" class="text-sm text-orange-400 hover:underline">
+      {{ showComments ? 'Kommentare verbergen' : 'Kommentare anzeigen' }}
+    </button>
+
+    @if (loadingComments) {
+      <div class="mt-2 text-center text-gray-400 animate-pulse">
+        🔄 Kommentare werden geladen...
+      </div>
+    } @else {
+      @if (showComments) {
+        <app-comment-list
+          [tweetId]="tweet.id"
+          [currentUserId]="currentUserId"
+        />
+      }
+    }
   </div>
 </article>
