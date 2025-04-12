@@ -1,9 +1,10 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from './authenticateToken';
 
-export function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): Response | void {
+export function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
   if (!req.user) {
-    return res.status(401).json({ message: 'Zugriff verweigert. Nicht eingeloggt.' });
+    res.status(401).json({ message: 'Zugriff verweigert. Nicht eingeloggt.' });
+    return;
   }
 
   next();

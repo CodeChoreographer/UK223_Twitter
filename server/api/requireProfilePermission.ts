@@ -1,18 +1,19 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from './authenticateToken';
-import { User } from '../database';
+import { UserInstance } from '../types/modelTypes';
 
 export async function requireProfilePermission(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<void | Response> {
+): Promise<void> {
   const targetUserId = parseInt(req.params.id) || req.body.userId;
   const currentUserId = req.user?.userId;
   const roles = req.user?.roles || [];
 
   if (!currentUserId || isNaN(targetUserId)) {
-    return res.status(400).json({ message: 'Ungültige Anfrage' });
+    res.status(400).json({ message: 'Ungültige Anfrage' });
+    return;
   }
 
   const isOwner = targetUserId === currentUserId;
@@ -21,6 +22,6 @@ export async function requireProfilePermission(
   if (isOwner || isAdmin) {
     next();
   } else {
-    return res.status(403).json({ message: 'Zugriff verweigert' });
+    res.status(403).json({ message: 'Zugriff verweigert' });
   }
 }

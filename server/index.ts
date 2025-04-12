@@ -1,9 +1,12 @@
-import express, { Express, Request, Response } from 'express'
+import express, { Express, Request, Response } from 'express';
 import { API } from './api'
-import http from 'http'
-import { resolve, dirname } from 'path'
+import * as http from 'http'
 import { Database } from './database'
 import cors from 'cors'
+import helmet from 'helmet';
+import { errorHandler } from './api/errorHandler';
+
+
 
 class Backend {
   // Properties
@@ -28,6 +31,8 @@ class Backend {
   // Constructor
   constructor() {
     this._app = express()
+    this._app.disable('x-powered-by');
+    this._app.use(helmet());
     this._app.use(cors())
     this._app.use(express.json())
 
@@ -36,13 +41,14 @@ class Backend {
     this._env = process.env.NODE_ENV || 'development'
 
     this.setupRoutes()
+    this._app.use(errorHandler);
     this.startServer()
   }
 
   private setupRoutes(): void {
-    this._app.get('/', (req: Request, res: Response) => {
-      const __dirname = resolve(dirname(''))
-    })
+    this._app.get('/', (_, res) => {
+      res.status(200).send('🚀 MiniTwitter Backend läuft');
+    });
   }
 
   private startServer(): void {

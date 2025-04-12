@@ -8,93 +8,69 @@ export class TweetController {
     const userId = req.user?.userId;
 
     if (!userId || !content) {
-      return res.status(400).json({ message: 'Invalide Anfrage: userId oder Inhalt fehlt' });
+      throw { status: 400, message: 'Invalide Anfrage: userId oder Inhalt fehlt' };
     }
 
-    try {
-      const tweet = await Tweet.create({ userId, content });
-      return res.status(201).json({ message: 'Beitrag erfolgreich gepostet', tweet });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Fehler beim Erstellen des Beitrags', error });
-    }
+    const tweet = await Tweet.create({ userId, content });
+    return res.status(201).json({ message: 'Beitrag erfolgreich gepostet', tweet });
   }
 
   async getAllTweets(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const currentUserId = req.user?.userId;
 
-    try {
-      const tweets = await Tweet.findAll({
-        include: [
-          { model: User, attributes: ['id', 'username'] },
-          { model: Like, attributes: ['userId'] }
-        ],
-        order: [['createdAt', 'DESC']]
-      });
+    const tweets = await Tweet.findAll({
+      include: [
+        { model: User, attributes: ['id', 'username'] },
+        { model: Like, attributes: ['userId'] }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
 
-      const result = tweets.map((tweet: any) => {
-        const likes = tweet.Likes || [];
-        const likedByMe = likes.some((like: any) => like.userId === currentUserId);
+    const result = tweets.map((tweet: any) => {
+      const likes = tweet.Likes || [];
+      const likedByMe = likes.some((like: any) => like.userId === currentUserId);
 
-        return {
-          id: tweet.id,
-          content: tweet.content,
-          createdAt: tweet.createdAt,
-          userId: tweet.userId,
-          user: tweet.User,
-          likes: likes.length,
-          likedByMe
-        };
-      });
+      return {
+        id: tweet.id,
+        content: tweet.content,
+        createdAt: tweet.createdAt,
+        userId: tweet.userId,
+        user: tweet.User,
+        likes: likes.length,
+        likedByMe
+      };
+    });
 
-      return res.status(200).json(result);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Fehler beim Laden der Beiträge', error });
-    }
+    return res.status(200).json(result);
   }
 
   async editTweet(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const { id, content } = req.body;
 
     if (!id || !content) {
-      return res.status(400).json({ message: 'Tweet-ID oder Inhalt fehlt' });
+      throw { status: 400, message: 'Tweet-ID oder Inhalt fehlt' };
     }
 
-    try {
-      const tweet = await Tweet.findByPk(id);
-      if (!tweet) {
-        return res.status(404).json({ message: 'Tweet nicht gefunden' });
-      }
+    const tweet = await Tweet.findByPk(id);
+    if (!tweet) throw { status: 404, message: 'Tweet nicht gefunden' };
 
-      await tweet.update({ content });
+    await tweet.update({ content });
 
-      return res.status(200).json({ message: 'Beitrag erfolgreich bearbeitet' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Fehler beim Bearbeiten des Beitrags', error });
-    }
+    return res.status(200).json({ message: 'Beitrag erfolgreich bearbeitet' });
   }
 
   async deleteTweet(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const id = parseInt(req.params.id);
 
     if (!id || isNaN(id)) {
-      return res.status(400).json({ message: 'Ungültige Tweet-ID' });
+      throw { status: 400, message: 'Ungültige Tweet-ID' };
     }
 
-    try {
-      const tweet = await Tweet.findByPk(id);
-      if (!tweet) {
-        return res.status(404).json({ message: 'Tweet nicht gefunden' });
-      }
+    const tweet = await Tweet.findByPk(id);
+    if (!tweet) throw { status: 404, message: 'Tweet nicht gefunden' };
 
-      await tweet.destroy();
+    await tweet.destroy();
 
-      return res.status(200).json({ message: 'Beitrag erfolgreich gelöscht' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Fehler beim Löschen des Beitrags', error });
-    }
+    return res.status(200).json({ message: 'Beitrag erfolgreich gelöscht' });
   }
 }

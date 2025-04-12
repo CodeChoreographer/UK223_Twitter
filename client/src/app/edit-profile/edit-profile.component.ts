@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { ToastrService } from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-edit-profile',
@@ -18,7 +20,7 @@ export class EditProfileComponent {
   message = '';
   userId: number | null = null;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router, private toastr: ToastrService) {
     const token = localStorage.getItem('token');
     if (token) {
       try {
@@ -26,7 +28,7 @@ export class EditProfileComponent {
         this.userId = decoded.userId;
         this.username = decoded.username;
       } catch {
-        this.message = 'Fehler beim Laden des Profils';
+        this.toastr.error('Fehler beim laden des Profils');
       }
     }
   }
@@ -35,18 +37,18 @@ export class EditProfileComponent {
     if (!this.userId || !this.username || !this.password) return;
 
     const body = {
-      id: this.userId,
+      userId: this.userId,
       username: this.username,
       password: this.password
     };
 
     this.http.put('/api/users/update', body).subscribe({
       next: () => {
-        this.message = 'Profil erfolgreich aktualisiert.';
-        setTimeout(() => this.router.navigate(['/dashboard']), 1500);
+        this.toastr.success('Profil wurde aktualisiert');
+        this.router.navigate(['/dashboard']);
       },
       error: () => {
-        this.message = 'Fehler beim Aktualisieren des Profils.';
+        this.toastr.error('Fehler beim Aktualisieren des Profils');
       }
     });
   }

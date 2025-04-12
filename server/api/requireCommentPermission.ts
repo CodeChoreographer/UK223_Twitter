@@ -1,33 +1,35 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from './authenticateToken';
 import { Comment } from '../database';
+import { CommentInstance } from '../types/modelTypes';
 
 export async function requireCommentPermission(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<void | Response> {
-  const commentId = req.body.id || parseInt(req.params.id);
+): Promise<void> {
+  const commentId = parseInt(req.params.id) || req.body.id;
   const userId = req.user?.userId;
   const roles = req.user?.roles || [];
 
-
   if (!userId || !commentId || isNaN(commentId)) {
-    return res.status(400).json({ message: 'Ungültige Anfrage' });
+    res.status(400).json({ message: 'Ungültige Anfrage' });
+    return;
   }
 
-  const comment = await Comment.findByPk(commentId);
+  const comment = await Comment.findByPk(commentId) as CommentInstance;
 
   if (!comment) {
-    return res.status(404).json({ message: 'Kommentar nicht gefunden' });
+    res.status(404).json({ message: 'Kommentar nicht gefunden' });
+    return;
   }
 
   const isOwner = comment.userId === userId;
   const isModeratorOrAdmin = roles.includes('moderator') || roles.includes('admin');
 
   if (isOwner || isModeratorOrAdmin) {
-    return next();
+    next();
   } else {
-    return res.status(403).json({ message: 'Zugriff verweigert' });
+    res.status(403).json({ message: 'Zugriff verweigert' });
   }
 }

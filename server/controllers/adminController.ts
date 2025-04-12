@@ -1,21 +1,18 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../api/authenticateToken';
 import { User, Role, UserRole } from '../database';
+import { RoleInstance } from '../types/modelTypes';
+
 
 export class AdminController {
-  async getAllUsers(req: AuthenticatedRequest, res: Response): Promise<Response> {
-    try {
-      const users = await User.findAll({
-        attributes: ['id', 'username', 'isActive'],
-        include: [{ model: Role, attributes: ['id', 'name'], through: { attributes: [] } }],
-        order: [['username', 'ASC']]
-      });
+  async getAllUsers(_req: AuthenticatedRequest, res: Response): Promise<Response> {
+    const users = await User.findAll({
+      attributes: ['id', 'username', 'isActive'],
+      include: [{ model: Role, attributes: ['id', 'name'], through: { attributes: [] } }],
+      order: [['username', 'ASC']]
+    });
 
-      return res.status(200).json(users);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Fehler beim Laden der Benutzer', error });
-    }
+    return res.status(200).json(users);
   }
 
   async addRoleToUser(req: AuthenticatedRequest, res: Response): Promise<Response> {
@@ -23,22 +20,17 @@ export class AdminController {
     const { roleName } = req.body;
 
     if (!userId || !roleName) {
-      return res.status(400).json({ message: 'Benutzer-ID oder Rollenname fehlt' });
+      throw { status: 400, message: 'Benutzer-ID oder Rollenname fehlt' };
     }
 
-    try {
-      const role = await Role.findOne({ where: { name: roleName } });
-      if (!role) return res.status(404).json({ message: 'Rolle nicht gefunden' });
+    const role = await Role.findOne({ where: { name: roleName } }) as RoleInstance;
+    if (!role) throw { status: 404, message: 'Rolle nicht gefunden' };
 
-      await UserRole.findOrCreate({
-        where: { userId, roleId: role.id }
-      });
+    await UserRole.findOrCreate({
+      where: { userId, roleId: role.id }
+    });
 
-      return res.status(200).json({ message: `Rolle ${roleName} hinzugefügt` });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Fehler beim Hinzufügen der Rolle', error });
-    }
+    return res.status(200).json({ message: `Rolle ${roleName} hinzugefügt` });
   }
 
   async removeRoleFromUser(req: AuthenticatedRequest, res: Response): Promise<Response> {
@@ -46,65 +38,49 @@ export class AdminController {
     const roleId = parseInt(req.params.roleId);
 
     if (!userId || !roleId) {
-      return res.status(400).json({ message: 'Benutzer-ID oder Rollen-ID fehlt' });
+      throw { status: 400, message: 'Benutzer-ID oder Rollen-ID fehlt' };
     }
 
-    try {
-      await UserRole.destroy({
-        where: { userId, roleId }
-      });
+    await UserRole.destroy({
+      where: { userId, roleId }
+    });
 
-      return res.status(200).json({ message: `Rolle entfernt` });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Fehler beim Entfernen der Rolle', error });
-    }
+    return res.status(200).json({ message: 'Rolle entfernt' });
   }
 
   async toggleUserActive(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const userId = parseInt(req.params.id);
     if (!userId || isNaN(userId)) {
-      return res.status(400).json({ message: 'Ungültige Benutzer-ID' });
+      throw { status: 400, message: 'Ungültige Benutzer-ID' };
     }
 
-    try {
-      const user = await User.findByPk(userId);
-      if (!user) {
-        return res.status(404).json({ message: 'Benutzer nicht gefunden' });
-      }
-
-      const updated = !user.getDataValue('isActive');
-      await user.update({ isActive: updated });
-
-      return res.status(200).json({
-        message: updated ? 'Benutzerkonto freigegeben' : 'Benutzerkonto gesperrt',
-        isActive: updated
-      });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Fehler beim Ändern des Benutzerstatus', error });
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw { status: 404, message: 'Benutzer nicht gefunden' };
     }
+
+    const updated = !user.getDataValue('isActive');
+    await user.update({ isActive: updated });
+
+    return res.status(200).json({
+      message: updated ? 'Benutzerkonto freigegeben' : 'Benutzerkonto gesperrt',
+      isActive: updated
+    });
   }
+
   async deleteUser(req: AuthenticatedRequest, res: Response): Promise<Response> {
     const userId = parseInt(req.params.id);
     if (!userId || isNaN(userId)) {
-      return res.status(400).json({ message: 'Ungültige Benutzer-ID' });
+      throw { status: 400, message: 'Ungültige Benutzer-ID' };
     }
 
-    try {
-      const user = await User.findByPk(userId);
-      if (!user) {
-        return res.status(404).json({ message: 'Benutzer nicht gefunden' });
-      }
-
-      await user.destroy();
-
-      return res.status(200).json({ message: 'Benutzerkonto gelöscht' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Fehler beim Löschen des Benutzers', error });
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw { status: 404, message: 'Benutzer nicht gefunden' };
     }
+
+    await user.destroy();
+
+    return res.status(200).json({ message: 'Benutzerkonto gelöscht' });
   }
-
-
 }

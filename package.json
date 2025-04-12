@@ -21,12 +21,15 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mariadb": "^3.4.1",
     "mysql2": "^3.14.0",
     "sequelize": "^6.37.7",
-    "vite-plugin-live-reload": "^3.0.4"
+    "vite-plugin-live-reload": "^3.0.4",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
