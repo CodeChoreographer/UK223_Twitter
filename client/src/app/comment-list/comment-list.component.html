@@ -19,10 +19,10 @@
         ></textarea>
 
         <div class="flex gap-2 mt-2">
-          <button (click)="saveEdit(comment)" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm">
+          <button (click)="saveEdit(comment)" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm cursor-pointer">
             Speichern
           </button>
-          <button (click)="cancelEdit()" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">
+          <button (click)="cancelEdit()" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm cursor-pointer">
             Abbrechen
           </button>
         </div>
@@ -30,10 +30,10 @@
         <p class="my-2 whitespace-pre-line text-white">{{ comment.content }}</p>
       }
 
-      <footer class="flex gap-4 text-sm text-gray-300 mt-2">
+      <footer class="flex gap-4 text-sm text-gray-300 mt-2 ">
         <button
           (click)="toggleLike(comment)"
-          class="hover:scale-105 transition"
+          class="cursor-pointer hover:scale-105 transition"
           [class.text-red-400]="comment.likedByMe"
           [class.text-gray-400]="!comment.likedByMe"
         >
@@ -41,10 +41,10 @@
         </button>
 
         @if (isOwnerOrModeratorOrAdmin(comment) && editingCommentId !== comment.id) {
-          <button (click)="startEdit(comment)" class="hover:text-blue-400 transition">
+          <button (click)="startEdit(comment)" class="hover:text-blue-400 transition cursor-pointer">
             ✏️ Bearbeiten
           </button>
-          <button (click)="deleteComment(comment.id)" class="hover:text-red-400 transition">
+          <button (click)="deleteComment(comment.id)" class="hover:text-red-400 transition cursor-pointer">
             🗑️ Löschen
           </button>
         }

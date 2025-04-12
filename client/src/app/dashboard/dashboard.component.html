@@ -1,29 +1,50 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-    <div class="absolute top-0 left-0 w-2 h-full bg-orange-400 opacity-10"></div>
-    <div class="absolute top-0 right-0 w-2 h-full bg-orange-400 opacity-10"></div>
-<nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
-  <span class="font-semibold text-lg">MiniTwitter</span>
-  <div class="flex gap-4">
-    @if (userRoles.includes('admin')) {
-      <a routerLink="/admin" class="text-orange-400 underline">🔧 Admin-Bereich</a>
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white relative">
+  <div class="absolute top-0 left-0 w-2 h-full bg-orange-400 opacity-10"></div>
+  <div class="absolute top-0 right-0 w-2 h-full bg-orange-400 opacity-10"></div>
+
+  <nav class="bg-gray-900 text-white p-4 flex justify-between items-center shadow-md">
+    <span class="font-bold text-xl tracking-wide text-orange-400">🔥 MiniTwitter  🔥</span>
+
+    <div class="flex gap-3">
+      @if (userRoles.includes('admin')) {
+        <a
+          routerLink="/admin"
+          class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded transition duration-200 cursor-pointer"
+        >
+          🔧 Admin-Bereich
+        </a>
+      }
+
+      <button
+        (click)="editProfile()"
+        class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded transition duration-200 cursor-pointer"
+      >
+        Profil bearbeiten
+      </button>
+
+      <button
+        (click)="logout()"
+        class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded transition duration-200 cursor-pointer"
+      >
+        Abmelden
+      </button>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto mt-8 px-4">
+    <app-tweet-form (tweetCreated)="reloadTweets()"></app-tweet-form>
+
+    @if (currentUserId !== null) {
+      <div class="space-y-6 mt-6 ">
+        <app-tweet-list
+          [tweets]="tweets"
+          [currentUserId]="currentUserId"
+          [userRoles]="userRoles"
+          (toggleLike)="toggleLike($event)"
+          (editTweet)="editTweet($event)"
+          (deleteTweet)="deleteTweet($event)"
+        />
+      </div>
     }
-    <button class="hover:text-orange-400" (click)="editProfile()">Profil bearbeiten</button>
-    <button class="hover:text-red-400" (click)="logout()">Abmelden</button>
-  </div>
-</nav>
-
-<main class="max-w-3xl mx-auto mt-6 px-4">
-  <app-tweet-form (tweetCreated)="reloadTweets()"></app-tweet-form>
-
-  @if (currentUserId !== null) {
-    <app-tweet-list
-      [tweets]="tweets"
-      [currentUserId]="currentUserId"
-      [userRoles]="userRoles"
-      (toggleLike)="toggleLike($event)"
-      (editTweet)="editTweet($event)"
-      (deleteTweet)="deleteTweet($event)"
-    />
-  }
-</main>
+  </main>
 </div>

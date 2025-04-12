@@ -1,4 +1,4 @@
-<article class="bg-gray-800 p-4 rounded-lg shadow">
+<article class="bg-gray-800 p-4 rounded-lg shadow mb-8">
   <header class="flex justify-between items-center text-sm text-orange-400 mb-2">
     <span>{{ tweet.user.username }}</span>
     @if (tweet.userId === currentUserId) {
@@ -16,8 +16,9 @@
 
     <button
       (click)="likeClicked.emit(tweet)"
+      class="cursor-pointer"
       [ngClass]="{
-    'text-red-500 scale-125 transition-transform duration-200 ease-in-out': tweet.likedByMe,
+    'text-red-500 scale-125 transition-transform duration-200 ease-in-out ': tweet.likedByMe,
     'text-gray-400': !tweet.likedByMe
   }"
     >
@@ -32,7 +33,7 @@
   </footer>
 
   <div class="mt-4 border-t border-gray-600 pt-4">
-    <button (click)="toggleComments()" class="text-sm text-orange-400 hover:underline">
+    <button (click)="toggleComments()" class="text-sm text-orange-400 hover:underline cursor-pointer">
       {{ showComments ? 'Kommentare verbergen' : 'Kommentare anzeigen' }}
     </button>
 

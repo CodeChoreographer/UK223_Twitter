@@ -1,16 +1,29 @@
+import { Express } from 'express';
 import { authenticateToken } from './authenticateToken';
 import { requireAuth } from './requireAuth';
 import { requireRole } from './requireRole';
+import { requireTweetPermission } from './requireTweetPermission';
+import { requireCommentPermission } from './requireCommentPermission';
+import { requireProfilePermission } from './requireProfilePermission';
+import { loginRateLimiter, registerRateLimiter } from './rateLimits'
+
+
+import { validate } from './validate';
+import {
+  registerSchema,
+  loginSchema,
+  updateUserSchema,
+  tweetCreateSchema,
+  tweetEditSchema,
+  commentAddSchema,
+  commentEditSchema,
+} from './validationSchemas';
 
 import { UserController } from '../controllers/userController';
 import { AdminController } from '../controllers/adminController';
 import { TweetController } from '../controllers/tweetController';
 import { CommentController } from '../controllers/commentController';
 import { LikeController } from '../controllers/likeController';
-import { requireTweetPermission } from './requireTweetPermission';
-import { requireCommentPermission } from './requireCommentPermission';
-import { requireProfilePermission } from './requireProfilePermission';
-
 
 export class API {
   private app: Express;
@@ -37,30 +50,80 @@ export class API {
     this.app.use(authenticateToken);
 
     // USERS
-    this.app.post('/api/users/register', this.userController.register.bind(this.userController));
-    this.app.post('/api/users/login', this.userController.login.bind(this.userController));
+    this.app.post(
+      '/api/users/register',
+      registerRateLimiter,
+      validate(registerSchema),
+      this.userController.register.bind(this.userController)
+    );
+
+    this.app.post(
+      '/api/users/login',
+      loginRateLimiter,
+      validate(loginSchema),
+      this.userController.login.bind(this.userController)
+    );
+
     this.app.put(
       '/api/users/update',
       requireAuth,
       requireProfilePermission,
+      validate(updateUserSchema),
       this.userController.updateProfile.bind(this.userController)
     );
 
     // TWEETS
-    this.app.get('/api/tweets', requireAuth, this.tweetController.getAllTweets.bind(this.tweetController));
-    this.app.post('/api/tweets/create', requireAuth, requireRole('user', 'moderator', 'admin'), this.tweetController.createTweet.bind(this.tweetController));
-    this.app.put('/api/tweets/edit', requireAuth, requireTweetPermission, this.tweetController.editTweet.bind(this.tweetController));
-    this.app.delete('/api/tweets/delete/:id', requireAuth, requireTweetPermission, this.tweetController.deleteTweet.bind(this.tweetController));
+    this.app.get(
+      '/api/tweets',
+      requireAuth,
+      this.tweetController.getAllTweets.bind(this.tweetController)
+    );
+
+    this.app.post(
+      '/api/tweets/create',
+      requireAuth,
+      requireRole('user', 'moderator', 'admin'),
+      validate(tweetCreateSchema),
+      this.tweetController.createTweet.bind(this.tweetController)
+    );
+
+    this.app.put(
+      '/api/tweets/edit',
+      requireAuth,
+      requireTweetPermission,
+      validate(tweetEditSchema),
+      this.tweetController.editTweet.bind(this.tweetController)
+    );
+
+    this.app.delete(
+      '/api/tweets/delete/:id',
+      requireAuth,
+      requireTweetPermission,
+      this.tweetController.deleteTweet.bind(this.tweetController)
+    );
 
     // COMMENTS
-    this.app.post('/api/comments/add', requireAuth, this.commentController.addComment.bind(this.commentController));
-    this.app.get('/api/comments/:tweetId', requireAuth, this.commentController.getComments.bind(this.commentController));
+    this.app.post(
+      '/api/comments/add',
+      requireAuth,
+      validate(commentAddSchema),
+      this.commentController.addComment.bind(this.commentController)
+    );
+
+    this.app.get(
+      '/api/comments/:tweetId',
+      requireAuth,
+      this.commentController.getComments.bind(this.commentController)
+    );
+
     this.app.put(
       '/api/comments/edit',
       requireAuth,
       requireCommentPermission,
+      validate(commentEditSchema),
       this.commentController.editComment.bind(this.commentController)
     );
+
     this.app.delete(
       '/api/comments/delete/:id',
       requireAuth,
@@ -69,10 +132,31 @@ export class API {
     );
 
     // LIKES
-    this.app.post('/api/likes/like', requireAuth, requireRole('user', 'moderator', 'admin'), this.likeController.likeTweet.bind(this.likeController));
-    this.app.delete('/api/likes/unlike', requireAuth, requireRole('user', 'moderator', 'admin'), this.likeController.unlikeTweet.bind(this.likeController));
-    this.app.post('/api/likes/comment/like', requireAuth, this.likeController.likeComment.bind(this.likeController));
-    this.app.delete('/api/likes/comment/unlike', requireAuth, this.likeController.unlikeComment.bind(this.likeController));
+    this.app.post(
+      '/api/likes/like',
+      requireAuth,
+      requireRole('user', 'moderator', 'admin'),
+      this.likeController.likeTweet.bind(this.likeController)
+    );
+
+    this.app.delete(
+      '/api/likes/unlike',
+      requireAuth,
+      requireRole('user', 'moderator', 'admin'),
+      this.likeController.unlikeTweet.bind(this.likeController)
+    );
+
+    this.app.post(
+      '/api/likes/comment/like',
+      requireAuth,
+      this.likeController.likeComment.bind(this.likeController)
+    );
+
+    this.app.delete(
+      '/api/likes/comment/unlike',
+      requireAuth,
+      this.likeController.unlikeComment.bind(this.likeController)
+    );
 
     // ADMINSPACE
     this.app.get(
@@ -95,21 +179,19 @@ export class API {
       requireRole('admin'),
       this.adminController.removeRoleFromUser.bind(this.adminController)
     );
+
     this.app.put(
       '/api/admin/users/:id/toggle-active',
       requireAuth,
       requireRole('admin'),
       this.adminController.toggleUserActive.bind(this.adminController)
     );
+
     this.app.delete(
       '/api/admin/users/:id',
       requireAuth,
       requireRole('admin'),
       this.adminController.deleteUser.bind(this.adminController)
     );
-
-
-
-
   }
 }
