@@ -1,17 +1,18 @@
+version: '3.8'
+
 services:
   mariadb:
     image: mariadb:latest
-    # command: '--default-authentication-plugin=mysql_native_password'
     volumes:
       - m223_project_mariadb:/var/lib/mysql
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=supersecret123
-      - MYSQL_DATABASE=minitwitter
-      - MYSQL_USER=minitwitter
-      - MYSQL_PASSWORD=supersecret123
+      MYSQL_ROOT_PASSWORD: supersecret123
+      MYSQL_DATABASE: minitwitter
+      MYSQL_USER: minitwitter
+      MYSQL_PASSWORD: supersecret123
     ports:
-      - 3306:3306
+      - "3306:3306"
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -19,11 +20,38 @@ services:
       - mariadb
     restart: always
     environment:
-      - PMA_HOST=mariadb
-      - PMA_PORT=3306
-      - MYSQL_ROOT_PASSWORD=supersecret123
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: supersecret123
     ports:
-      - 9200:80
+      - "9200:80"
+
+  backend:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    depends_on:
+      - mariadb
+    environment:
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: minitwitter
+      DB_USER: minitwitter
+      DB_PASSWORD: supersecret123
+      JWT_SECRET: devsecret123
+      JWT_EXPIRES_IN: 5h
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
 
 volumes:
   m223_project_mariadb:

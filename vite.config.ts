@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import { VitePluginNode } from 'vite-plugin-node'
-
+import { defineConfig } from 'vite';
+import { VitePluginNode } from 'vite-plugin-node';
+import { builtinModules } from 'module';
 
 export default defineConfig({
   root: '.',
@@ -17,6 +17,11 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
+    rollupOptions: {
+      external: [
+        ...builtinModules,
+      ],
+    },
   },
   plugins: [
     ...VitePluginNode({
@@ -26,4 +31,4 @@ export default defineConfig({
       tsCompiler: 'esbuild',
     }),
   ],
-})
+});
