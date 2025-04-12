@@ -1,23 +1,19 @@
-# A simple typescript starter project
+# 🐦🔥 MiniTwitter – Fullstack Docker Project
 
+A simple Twitter clone with user management, roles, comments, and likes – built using **Angular (Frontend)**, **Express (Backend)**, and **MariaDB (Database)**.  
+Everything runs entirely via Docker.
 
-## Getting Started
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Docker Desktop** (with Docker Compose)
+
+### Start Command
+
+Run the following command in the root of the project:
 
 ```bash
-
-# Install packages
-npm install
-navigate to client/ and use npm install again
-
-# Start docker compose for database
-docker compose up -d
-
-# Start frontend & backend in dev mode
-cd ./server
-npm run dev
-
-# Start frontend
-cd ./client
-ng serve --open
-
-```
+docker-compose up --build
